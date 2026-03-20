@@ -1,8 +1,6 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.request.CreateOrderRequest;
-import com.example.demo.dto.response.OrderDetailResponse;
-import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
@@ -73,25 +71,10 @@ public class OrderServiceImpl implements OrderService {
 
     orderDAO.save(newOrder);
 
-    logger.info("Created oder successfully" + newOrder.getOrderId());
+    logger.info("Created order successfully" + newOrder.getOrderId());
 
     return newOrder;
   }
 
-  @Override
-  public OrderDetailResponse getOrderDetail(String orderId) {
-    logger.info("Getting order detail with id " + orderId);
 
-    if(orderId == null || orderId.trim().isEmpty()) {
-      throw new ValidationException("OrderId cannot be null.");
-    }
-    Order order = orderDAO.findById(orderId);
-
-    if(order == null) {
-      throw new OrderNotFoundException("Order with id " + orderId + " not found.");
-    }
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    return OrderDetailResponse.builder().orderId(order.getOrderId()).customerId(order.getCustomerId()).customerName(order.getCustomerName()).amount(order.getAmount()).paymentMethod(order.getPaymentMethod().name()).feeAmount(order.getFeeAmount()).discountAmount(order.getDiscountAmount()).finalAmount(order.getFinalAmount()).status(order.getStatus().name()).createdAt(order.getCreatedAt().format(formatter)).updatedAt(order.getUpdatedAt().format(formatter)).build();
-  }
 }

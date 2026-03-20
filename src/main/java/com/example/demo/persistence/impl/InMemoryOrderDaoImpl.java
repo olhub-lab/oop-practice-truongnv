@@ -16,9 +16,4 @@ public class InMemoryOrderDaoImpl implements OrderDAO {
     database.put(order.getOrderId(), order);
     logger.info(order.getOrderId());
   }
-
-  @Override
-  public Order findById(String orderId) {
-    return database.get(orderId);
-  }
 }
