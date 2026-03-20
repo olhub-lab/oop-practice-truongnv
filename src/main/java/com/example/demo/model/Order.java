@@ -1,9 +1,11 @@
 package com.example.demo.model;
 
-import com.example.demo.model.enums.OrderStatus;
-import com.example.demo.model.enums.PaymentMethod;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.example.demo.model.enums.OrderStatus;
+import com.example.demo.model.enums.PaymentMethod;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,4 +24,17 @@ public class Order {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private String cancelReason;
+
+  public void calculateFinalAmount() {
+    if(this.amount == null || this.paymentMethod == null) return;
+
+    BigDecimal feeRate = this.paymentMethod.getFeeRate();
+    BigDecimal discountRate = this.paymentMethod.getDiscountRate();
+
+    this.feeAmount = this.amount.multiply(feeRate);
+    this.discountAmount = this.amount.multiply(discountRate);
+
+    this.finalAmount = this.amount.add(this.feeAmount).subtract(this.discountAmount);
+  }
 }
+
