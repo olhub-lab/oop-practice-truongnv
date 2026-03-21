@@ -3,8 +3,8 @@ package com.example.demo;
 import com.example.demo.dto.request.CreateOrderRequest;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.PaymentMethod;
-import com.example.demo.persistence.OrderDAO;
-import com.example.demo.persistence.impl.InMemoryOrderDaoImpl;
+import com.example.demo.persistence.OrderRepository;
+import com.example.demo.persistence.impl.InMemoryOrderRepository;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.impl.OrderServiceImpl;
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class App {
 
   public static void main(String[] args) {
-    OrderDAO orderDAO = new InMemoryOrderDaoImpl();
+    OrderRepository orderDAO = new InMemoryOrderRepository();
     OrderService orderService = new OrderServiceImpl(orderDAO);
     Scanner scanner = new Scanner(System.in);
 
@@ -55,7 +55,7 @@ public class App {
 
       System.out.println();
       System.out.println("Order ID: " + order.getOrderId());
-      System.out.println("Stauts: " + order.getStatus());
+      System.out.println("Status: " + order.getStatus());
       System.out.println("Final amount: " + order.getFinalAmount());
       System.out.println("Created time: " + order.getCreatedAt());
       System.out.println();

@@ -4,7 +4,7 @@ import com.example.demo.dto.request.CreateOrderRequest;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
-import com.example.demo.persistence.OrderDAO;
+import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,9 +18,9 @@ public class OrderServiceImpl implements OrderService {
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
   private static final AtomicLong counter = new AtomicLong(0);
 
-  private final OrderDAO orderDAO;
+  private final OrderRepository orderDAO;
 
-  public OrderServiceImpl(OrderDAO orderDAO) {
+  public OrderServiceImpl(OrderRepository orderDAO) {
     this.orderDAO = orderDAO;
   }
 
@@ -38,6 +38,9 @@ public class OrderServiceImpl implements OrderService {
     }
     if (request.getCustomerName() == null || request.getCustomerName().trim().isEmpty()) {
       throw new ValidationException("CustomerName cannot be empty.");
+    }
+    if (request.getCustomerName().length() > 100) {
+      throw new ValidationException("CustomerName cannot be longer than 100 characters.");
     }
     if (request.getPaymentMethod() == null) {
       throw new ValidationException("PaymentMethod cannot be null.");
