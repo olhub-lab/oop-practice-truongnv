@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.request.CreateOrderRequest;
+import com.example.demo.dto.response.OrderDetailResponse;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
@@ -18,10 +19,10 @@ public class OrderServiceImpl implements OrderService {
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
   private static final AtomicLong counter = new AtomicLong(0);
 
-  private final OrderRepository orderDAO;
+  private final OrderRepository orderRepository;
 
-  public OrderServiceImpl(OrderRepository orderDAO) {
-    this.orderDAO = orderDAO;
+  public OrderServiceImpl(OrderRepository orderRepository) {
+    this.orderRepository = orderRepository;
   }
 
   private String generateOrderId() {
@@ -72,12 +73,42 @@ public class OrderServiceImpl implements OrderService {
 
     newOrder.calculateFinalAmount();
 
-    orderDAO.save(newOrder);
+    orderRepository.save(newOrder);
 
     logger.info("Created order successfully" + newOrder.getOrderId());
 
     return newOrder;
   }
 
+  @Override
+  public OrderDetailResponse getOrderDetail(String orderId) {
+    logger.info("Getting order details for orderId " + orderId);
 
+    if(orderId == null || orderId.trim().isEmpty()) {
+      throw new ValidationException("OrderId cannot be null.");
+    }
+
+    Order order = orderRepository.findById(orderId);
+    if(order == null) {
+      throw new ValidationException("Order Not Found: " + orderId);
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+    OrderDetailResponse response = new OrderDetailResponse();
+    response.setOrderId(order.getOrderId());
+    response.setCustomerId(order.getCustomerId());
+    response.setCustomerName(order.getCustomerName());
+    response.setAmount(order.getAmount());
+    response.setPaymentMethod(order.getPaymentMethod().name());
+    response.setFeeAmount(order.getFeeAmount());
+    response.setDiscountAmount(order.getDiscountAmount());
+    response.setFinalAmount(order.getFinalAmount());
+    response.setStatus(order.getStatus().name());
+    response.setCreatedAt(order.getCreatedAt().format(formatter));
+    response.setUpdatedAt(order.getUpdatedAt().format(formatter));
+    response.setCancelReason(order.getCancelReason());
+
+    return response;
+  }
 }
