@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.request.CreateOrderRequest;
+import com.example.demo.dto.response.CancelOrderResponse;
 import com.example.demo.dto.response.OrderDetailResponse;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
@@ -108,6 +109,36 @@ public class OrderServiceImpl implements OrderService {
     response.setCreatedAt(order.getCreatedAt().format(formatter));
     response.setUpdatedAt(order.getUpdatedAt().format(formatter));
     response.setCancelReason(order.getCancelReason());
+
+    return response;
+  }
+
+  @Override
+  public CancelOrderResponse cancelOrder(String orderId, String reason){
+    logger.info("Canceling order with id " + orderId);
+    if(orderId == null || orderId.trim().isEmpty()) {
+      throw new ValidationException("OrderId cannot be null.");
+    }
+
+    Order order = orderRepository.findById(orderId);
+    if(order == null) {
+      throw new ValidationException("Order Not Found: " + orderId);
+    }
+    String oldStatus = order.getStatus().name();
+    order.cancel(reason);
+
+    orderRepository.save(order);
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    CancelOrderResponse response = new CancelOrderResponse();
+    response.setOrderId(order.getOrderId());
+    response.setOldStatus(oldStatus);
+    response.setNewStatus(order.getStatus().name());
+    response.setCancelReason(order.getCancelReason());
+    response.setCanceledAt(order.getUpdatedAt().format(formatter));
+    response.setMessage("Order Cancel successfully");
+
+    logger.info("Canceled order successfully" + orderId);
 
     return response;
   }

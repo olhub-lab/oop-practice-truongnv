@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.example.demo.exception.ValidationException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -224,5 +225,24 @@ public class Order {
       return new Order(this);
     }
   }
+
+  public void cancel(String reason) {
+    if (this.status != OrderStatus.PENDING) {
+      throw new ValidationException(
+          String.format("Can not cancel order %s because it in status %s", this.orderId,
+              this.status.name())
+      );
+    }
+    this.status = OrderStatus.CANCELLED;
+    this.cancelReason =
+        (reason == null || reason.trim().isEmpty()) ? "Cancel follow default request" : reason;
+
+    if (this.cancelReason.length() > 500) {
+      throw new ValidationException("The reason can not be above 500 characters");
+    }
+    this.updatedAt = LocalDateTime.now();
+
+  }
+
 }
 
