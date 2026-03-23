@@ -2,7 +2,9 @@ package com.example.demo.persistence.impl;
 
 import com.example.demo.model.Order;
 import com.example.demo.persistence.OrderRepository;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -20,5 +22,10 @@ public class InMemoryOrderRepository implements OrderRepository {
   @Override
   public Order findById(String orderId) {
     return database.get(orderId);
+  }
+
+  @Override
+  public List<Order> findAll() {
+    return new ArrayList<>(database.values());
   }
 }
