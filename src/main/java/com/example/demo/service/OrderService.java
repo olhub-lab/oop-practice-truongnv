@@ -1,8 +1,17 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.CreateOrderRequest;
+import java.util.List;
+
 import com.example.demo.model.Order;
 
 public interface OrderService {
-  Order createOrder(CreateOrderRequest request);
+  Order create(Order order);
+
+  Order update(Order order);
+
+  Order get(String id);
+
+  void delete(String id);
+
+  List<Order> filter();
 }
