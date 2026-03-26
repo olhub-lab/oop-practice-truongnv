@@ -1,4 +1,4 @@
-package com.example.demo.dto.request;
+package com.example.demo.dto.order;
 
 import com.example.demo.model.enums.PaymentMethod;
 import java.math.BigDecimal;

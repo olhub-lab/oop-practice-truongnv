@@ -1,82 +1,33 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.request.CreateOrderRequest;
-import com.example.demo.exception.ValidationException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+import java.util.logging.Logger;
+
+import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 
 public class OrderServiceImpl implements OrderService {
 
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
-  private static final AtomicLong counter = new AtomicLong(0);
 
-  private final OrderRepository orderDAO;
+  private final OrderRepository orderRepository;
 
-  public OrderServiceImpl(OrderRepository orderDAO) {
-    this.orderDAO = orderDAO;
+  public OrderServiceImpl(OrderRepository orderRepository) {
+    this.orderRepository = orderRepository;
   }
-
-  private String generateOrderId() {
-    String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-    return String.format("ORD-%s-%05d", datePart, counter.incrementAndGet());
-  }
-
-  private void validateRequest(CreateOrderRequest request) {
-    if (request == null) {
-      throw new ValidationException("Request cannot be null.");
-    }
-    if (request.getCustomerId() == null || request.getCustomerId() <= 0) {
-      throw new ValidationException("CustomerId cannot be null.");
-    }
-    if (request.getCustomerName() == null || request.getCustomerName().trim().isEmpty()) {
-      throw new ValidationException("CustomerName cannot be empty.");
-    }
-    if (request.getCustomerName().length() > 100) {
-      throw new ValidationException("CustomerName cannot be longer than 100 characters.");
-    }
-    if (request.getPaymentMethod() == null) {
-      throw new ValidationException("PaymentMethod cannot be null.");
-    }
-    if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-      throw new ValidationException("Amount must be greater than 0.");
-    }
-  }
-
 
   @Override
-  public Order createOrder(CreateOrderRequest request) {
-    logger.info("Creating order with id " + request.getCustomerId());
+  public Order createOrder(Order order) {
+    logger.info(() -> "Service executing save order: " + order.getOrderId());
 
-    validateRequest(request);
-
-    LocalDateTime now = LocalDateTime.now();
-
-    Order newOrder = Order.builder()
-        .orderId(generateOrderId())
-        .customerId(request.getCustomerId())
-        .customerName(request.getCustomerName())
-        .amount(request.getAmount())
-        .paymentMethod(request.getPaymentMethod())
-        .status(OrderStatus.PENDING)
-        .createdAt(now)
-        .updatedAt(now)
-        .build();
-
-    newOrder.calculateFinalAmount();
-
-    orderDAO.save(newOrder);
-
-    logger.info("Created order successfully" + newOrder.getOrderId());
-
-    return newOrder;
+    orderRepository.save(order);
+    return order;
   }
 
 

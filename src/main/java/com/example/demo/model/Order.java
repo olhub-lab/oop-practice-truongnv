@@ -221,8 +221,9 @@ public class Order {
     }
 
     public Order build() {
-      return new Order(this);
+      Order order = new Order(this);
+      order.calculateFinalAmount();
+      return order;
     }
   }
 }
-
