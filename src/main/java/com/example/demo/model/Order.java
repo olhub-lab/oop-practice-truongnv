@@ -1,9 +1,10 @@
 package com.example.demo.model;
 
-import com.example.demo.exception.ValidationException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.demo.exception.InvalidOrderStatusException;
+import com.example.demo.exception.ValidationException;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
 
@@ -227,22 +228,20 @@ public class Order {
   }
 
   public void cancel(String reason) {
+    if (reason == null || reason.trim().isEmpty()) {
+      throw new ValidationException("Cancel reason is required and cannot be empty.");
+    }
+    if (reason.length() > 500) {
+      throw new ValidationException("Cancel reason cannot exceed 500 characters.");
+    }
+
     if (this.status != OrderStatus.PENDING) {
-      throw new ValidationException(
-          String.format("Can not cancel order %s because it in status %s", this.orderId,
-              this.status.name())
-      );
+      throw new InvalidOrderStatusException(
+          String.format("Order %s cannot be cancelled. Current status is %s.", this.orderId, this.status));
     }
     this.status = OrderStatus.CANCELLED;
-    this.cancelReason =
-        (reason == null || reason.trim().isEmpty()) ? "Cancel follow default request" : reason;
-
-    if (this.cancelReason.length() > 500) {
-      throw new ValidationException("The reason can not be above 500 characters");
-    }
+    this.cancelReason = reason;
     this.updatedAt = LocalDateTime.now();
-
   }
 
 }
-

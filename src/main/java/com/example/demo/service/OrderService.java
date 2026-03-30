@@ -1,13 +1,19 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.CreateOrderRequest;
-import com.example.demo.dto.response.CancelOrderResponse;
-import com.example.demo.dto.response.OrderDetailResponse;
+import java.util.List;
+
 import com.example.demo.model.Order;
 
 public interface OrderService {
-  Order createOrder(CreateOrderRequest request);
+  Order create(Order order);
 
-  OrderDetailResponse getOrderDetail(String orderId);
-  CancelOrderResponse cancelOrder(String orderId, String reason);
+  Order update(Order order);
+
+  Order get(String id);
+
+  void delete(String id);
+
+  List<Order> filter();
+
+  Order cancelOrder(String orderId, String reason);
 }
