@@ -1,20 +1,25 @@
 package com.example.demo;
 
-import com.example.demo.dto.request.CreateOrderRequest;
-import com.example.demo.model.Order;
+import java.math.BigDecimal;
+import java.util.Scanner;
+
+import com.example.demo.dto.order.CreateOrderRequest;
+import com.example.demo.dto.order.OrderResponse;
+import com.example.demo.facade.OrderFacade;
+import com.example.demo.facade.impl.OrderFacadeImpl;
 import com.example.demo.model.enums.PaymentMethod;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.persistence.impl.InMemoryOrderRepository;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.impl.OrderServiceImpl;
-import java.math.BigDecimal;
-import java.util.Scanner;
 
-public class App {
+public class Main {
 
   public static void main(String[] args) {
-    OrderRepository orderDAO = new InMemoryOrderRepository();
-    OrderService orderService = new OrderServiceImpl(orderDAO);
+    OrderRepository orderRepository = new InMemoryOrderRepository();
+    OrderService orderService = new OrderServiceImpl(orderRepository);
+    OrderFacade orderFacade = new OrderFacadeImpl(orderService);
+
     Scanner scanner = new Scanner(System.in);
 
     System.out.println("CREATE ORDER");
@@ -51,13 +56,13 @@ public class App {
           throw new IllegalArgumentException("Your choice is incorrect.");
       }
 
-      Order order = orderService.createOrder(request);
+      OrderResponse response = orderFacade.createOrder(request);
 
       System.out.println();
-      System.out.println("Order ID: " + order.getOrderId());
-      System.out.println("Status: " + order.getStatus());
-      System.out.println("Final amount: " + order.getFinalAmount());
-      System.out.println("Created time: " + order.getCreatedAt());
+      System.out.println("Order ID: " + response.getOrderId());
+      System.out.println("Status: " + response.getStatus());
+      System.out.println("Final amount: " + response.getFinalAmount());
+      System.out.println("Created time: " + response.getCreatedAt());
       System.out.println();
 
     } catch (Exception e) {
