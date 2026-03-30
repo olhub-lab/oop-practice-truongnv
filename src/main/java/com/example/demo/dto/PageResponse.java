@@ -1,15 +1,24 @@
-package com.example.demo.dto.response;
+package com.example.demo.dto;
 
 import java.util.List;
 
 public class PageResponse<T> {
-
   private List<T> content;
-  private int totalElements;
+  private long totalElements;
   private int totalPages;
   private boolean hasNext;
   private boolean hasPrevious;
 
+  public PageResponse() {
+  }
+
+  public PageResponse(List<T> content, long totalElements, int totalPages, boolean hasNext, boolean hasPrevious) {
+    this.content = content;
+    this.totalElements = totalElements;
+    this.totalPages = totalPages;
+    this.hasNext = hasNext;
+    this.hasPrevious = hasPrevious;
+  }
 
   public List<T> getContent() {
     return content;
@@ -19,11 +28,11 @@ public class PageResponse<T> {
     this.content = content;
   }
 
-  public int getTotalElements() {
+  public long getTotalElements() {
     return totalElements;
   }
 
-  public void setTotalElements(int totalElements) {
+  public void setTotalElements(long totalElements) {
     this.totalElements = totalElements;
   }
 

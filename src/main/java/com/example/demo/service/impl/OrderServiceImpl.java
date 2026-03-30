@@ -1,31 +1,22 @@
 package com.example.demo.service.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.example.demo.dto.request.CreateOrderRequest;
-import com.example.demo.dto.request.ListOrderRequest;
-import com.example.demo.dto.response.CancelOrderResponse;
-import com.example.demo.dto.response.OrderDetailResponse;
-import com.example.demo.dto.response.PageResponse;
+import com.example.demo.dto.PageResponse;
+import com.example.demo.dto.order.OrderFilterRequest;
+import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
-import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
 public class OrderServiceImpl implements OrderService {
 
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
-  private static final AtomicLong counter = new AtomicLong(0);
 
   private final OrderRepository orderRepository;
 
@@ -33,182 +24,100 @@ public class OrderServiceImpl implements OrderService {
     this.orderRepository = orderRepository;
   }
 
-  private String generateOrderId() {
-    String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-    return String.format("ORD-%s-%05d", datePart, counter.incrementAndGet());
-  }
-
-  private void validateRequest(CreateOrderRequest request) {
-    if (request == null) {
-      throw new ValidationException("Request cannot be null.");
-    }
-    if (request.getCustomerId() == null || request.getCustomerId() <= 0) {
-      throw new ValidationException("CustomerId cannot be null.");
-    }
-    if (request.getCustomerName() == null || request.getCustomerName().trim().isEmpty()) {
-      throw new ValidationException("CustomerName cannot be empty.");
-    }
-    if (request.getCustomerName().length() > 100) {
-      throw new ValidationException("CustomerName cannot be longer than 100 characters.");
-    }
-    if (request.getPaymentMethod() == null) {
-      throw new ValidationException("PaymentMethod cannot be null.");
-    }
-    if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-      throw new ValidationException("Amount must be greater than 0.");
-    }
-  }
-
-  private OrderDetailResponse mapToOrderDetailResponse(Order order) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
-    OrderDetailResponse response = new OrderDetailResponse();
-    response.setOrderId(order.getOrderId());
-    response.setCustomerId(order.getCustomerId());
-    response.setCustomerName(order.getCustomerName());
-    response.setAmount(order.getAmount());
-    response.setPaymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null);
-    response.setFeeAmount(order.getFeeAmount());
-    response.setDiscountAmount(order.getDiscountAmount());
-    response.setFinalAmount(order.getFinalAmount());
-    response.setStatus(order.getStatus() != null ? order.getStatus().name() : null);
-    if (order.getCreatedAt() != null) {
-      response.setCreatedAt(order.getCreatedAt().format(formatter));
-    }
-    if (order.getUpdatedAt() != null) {
-      response.setUpdatedAt(order.getUpdatedAt().format(formatter));
-    }
-    response.setCancelReason(order.getCancelReason());
-
-    return response;
-  }
-
   @Override
-  public Order createOrder(CreateOrderRequest request) {
-    logger.info("Creating order with id " + request.getCustomerId());
-
-    validateRequest(request);
-
-    LocalDateTime now = LocalDateTime.now();
-
-    Order newOrder = Order.builder()
-        .orderId(generateOrderId())
-        .customerId(request.getCustomerId())
-        .customerName(request.getCustomerName())
-        .amount(request.getAmount())
-        .paymentMethod(request.getPaymentMethod())
-        .status(OrderStatus.PENDING)
-        .createdAt(now)
-        .updatedAt(now)
-        .build();
-
-    newOrder.calculateFinalAmount();
-
-    orderRepository.save(newOrder);
-
-    logger.info("Created order successfully" + newOrder.getOrderId());
-
-    return newOrder;
-  }
-
-  @Override
-  public OrderDetailResponse getOrderDetail(String orderId) {
-    logger.info("Getting order details for orderId " + orderId);
-
-    if (orderId == null || orderId.trim().isEmpty()) {
-      throw new ValidationException("OrderId cannot be null.");
-    }
-
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new ValidationException("Order Not Found: " + orderId);
-    }
-
-    return mapToOrderDetailResponse(order);
-  }
-
-  @Override
-  public CancelOrderResponse cancelOrder(String orderId, String reason) {
-    logger.info("Canceling order with id " + orderId);
-    if (orderId == null || orderId.trim().isEmpty()) {
-      throw new ValidationException("OrderId cannot be null.");
-    }
-
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new ValidationException("Order Not Found: " + orderId);
-    }
-    String oldStatus = order.getStatus().name();
-    order.cancel(reason);
+  public Order create(Order order) {
+    logger.info(() -> "Creating order with id " + order.getCustomerId());
 
     orderRepository.save(order);
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    CancelOrderResponse response = new CancelOrderResponse();
-    response.setOrderId(order.getOrderId());
-    response.setOldStatus(oldStatus);
-    response.setNewStatus(order.getStatus().name());
-    response.setCancelReason(order.getCancelReason());
-    response.setCanceledAt(order.getUpdatedAt().format(formatter));
-    response.setMessage("Order Cancel successfully");
-
-    logger.info("Canceled order successfully" + orderId);
-
-    return response;
+    return order;
   }
 
   @Override
-  public PageResponse<OrderDetailResponse> listOrders(ListOrderRequest request) {
-    int page = Math.max(request.getPage(), 0);
-    int size = request.getSize() <= 0 ? 10 : Math.min(request.getSize(), 100);
+  public Order update(Order order) {
+    logger.info(() -> "Updating order with id " + order.getOrderId());
 
-    List<Order> allOrders = orderRepository.findAll();
+    orderRepository.update(order);
 
-    List<Order> filteredOrders = allOrders.stream()
-        .filter(o -> request.getCustomerId() == null || o.getCustomerId().equals(request.getCustomerId()))
-        .filter(o -> request.getStatus() == null || o.getStatus() == request.getStatus())
-        .filter(o -> request.getPaymentMethod() == null || o.getPaymentMethod() == request.getPaymentMethod())
-        .filter(o -> request.getFromDate() == null
-            || (o.getCreatedAt() != null && !o.getCreatedAt().toLocalDate().isBefore(request.getFromDate())))
-        .filter(o -> request.getToDate() == null
-            || (o.getCreatedAt() != null && !o.getCreatedAt().toLocalDate().isAfter(request.getToDate())))
-        .collect(Collectors.toList());
+    return order;
+  }
 
-    Comparator<Order> comparator = Comparator.comparing(Order::getCreatedAt);
-    if ("AMOUNT".equalsIgnoreCase(request.getSortBy())) {
-      comparator = Comparator.comparing(Order::getFinalAmount);
-    } else if ("NAME".equalsIgnoreCase(request.getSortBy())) {
-      comparator = Comparator.comparing(Order::getCustomerName);
+  @Override
+  public Order get(String orderId) {
+    logger.info(() -> "service get order with id " + orderId);
+    Order order = orderRepository.get(orderId);
+
+    if (order == null) {
+      throw new OrderNotFoundException("Order not found with id " + orderId);
+    }
+    return order;
+  }
+
+  @Override
+  public void delete(String orderId) {
+
+  }
+
+  @Override
+  public PageResponse<Order> findAll(OrderFilterRequest request) {
+    logger.info(() -> "listOrders param: page=" + request.getPage()
+        + ", size=" + request.getSize() + ", status=" + request.getStatus());
+
+    if (request.getFromDate() != null && request.getToDate() != null
+        && request.getFromDate().isAfter(request.getToDate())) {
+      throw new ValidationException("fromDate must be before or equal to toDate");
     }
 
-    if (!"ASC".equalsIgnoreCase(request.getSortOrder())) {
+    List<Order> allOrders = orderRepository.findAll();
+    Stream<Order> stream = allOrders.stream();
+
+    if (request.getCustomerId() != null) {
+      stream = stream.filter(o -> o.getCustomerId().equals(request.getCustomerId()));
+    }
+    if (request.getStatus() != null) {
+      stream = stream.filter(o -> o.getStatus() == request.getStatus());
+    }
+    if (request.getPaymentMethod() != null) {
+      stream = stream.filter(o -> o.getPaymentMethod() == request.getPaymentMethod());
+    }
+    if (request.getFromDate() != null) {
+      stream = stream.filter(o -> !o.getCreatedAt().toLocalDate().isBefore(request.getFromDate()));
+    }
+    if (request.getToDate() != null) {
+      stream = stream.filter(o -> !o.getCreatedAt().toLocalDate().isAfter(request.getToDate()));
+    }
+
+    Comparator<Order> comparator;
+    switch (request.getSortBy().toUpperCase()) {
+      case "AMOUNT":
+        comparator = Comparator.comparing(Order::getFinalAmount);
+        break;
+      case "CUSTOMER_NAME":
+        comparator = Comparator.comparing(Order::getCustomerName);
+        break;
+      case "CREATED_AT":
+      default:
+        comparator = Comparator.comparing(Order::getCreatedAt);
+        break;
+    }
+    if ("DESC".equalsIgnoreCase(request.getSortDirection())) {
       comparator = comparator.reversed();
     }
 
-    filteredOrders.sort(comparator);
+    List<Order> filteredAndSorted = stream.sorted(comparator).collect(Collectors.toList());
 
-    int totalElements = filteredOrders.size();
-    int totalPages = (int) Math.ceil((double) totalElements / size);
+    int totalElements = filteredAndSorted.size();
+    int totalPages = (int) Math.ceil((double) totalElements / request.getSize());
+    int skip = request.getPage() * request.getSize();
 
-    int start = page * size;
-    int end = Math.min(start + size, totalElements);
+    List<Order> content = filteredAndSorted.stream()
+        .skip(skip)
+        .limit(request.getSize())
+        .collect(Collectors.toList());
 
-    List<OrderDetailResponse> content;
-    if (start >= totalElements) {
-      content = Collections.emptyList();
-    } else {
-      content = filteredOrders.subList(start, end).stream()
-          .map(o -> this.mapToOrderDetailResponse(o))
-          .collect(Collectors.toList());
-    }
+    boolean hasNext = (request.getPage() + 1) < totalPages;
+    boolean hasPrevious = request.getPage() > 0;
 
-    PageResponse<OrderDetailResponse> response = new PageResponse<>();
-    response.setContent(content);
-    response.setTotalElements(totalElements);
-    response.setTotalPages(totalPages);
-    response.setHasNext(page < totalPages - 1);
-    response.setHasPrevious(page > 0);
-
-    return response;
+    return new PageResponse<>(content, totalElements, totalPages, hasNext, hasPrevious);
   }
 }

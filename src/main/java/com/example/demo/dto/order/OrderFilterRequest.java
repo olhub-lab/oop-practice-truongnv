@@ -1,12 +1,11 @@
-package com.example.demo.dto.request;
+package com.example.demo.dto.order;
 
 import java.time.LocalDate;
 
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
 
-public class ListOrderRequest {
-
+public class OrderFilterRequest {
   private Long customerId;
   private OrderStatus status;
   private PaymentMethod paymentMethod;
@@ -15,10 +14,9 @@ public class ListOrderRequest {
 
   private int page = 0;
   private int size = 10;
-  private String sortBy;
-  private String sortOrder;
 
-
+  private String sortBy = "CREATED_AT";
+  private String sortDirection = "DESC";
 
   public Long getCustomerId() {
     return customerId;
@@ -73,7 +71,7 @@ public class ListOrderRequest {
   }
 
   public void setSize(int size) {
-    this.size = size;
+    this.size = (size > 100) ? 100 : Math.max(1, size);
   }
 
   public String getSortBy() {
@@ -84,12 +82,11 @@ public class ListOrderRequest {
     this.sortBy = sortBy;
   }
 
-  public String getSortOrder() {
-    return sortOrder;
+  public String getSortDirection() {
+    return sortDirection;
   }
 
-  public void setSortOrder(String sortOrder) {
-    this.sortOrder = sortOrder;
+  public void setSortDirection(String sortDirection) {
+    this.sortDirection = sortDirection;
   }
-
 }

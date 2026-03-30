@@ -1,22 +1,46 @@
-package com.example.demo.dto.response;
+package com.example.demo.dto.order;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 
-public class OrderDetailResponse {
+import com.example.demo.model.Order;
+import com.example.demo.model.enums.OrderStatus;
+import com.example.demo.model.enums.PaymentMethod;
 
+public class OrderResponse {
   private String orderId;
   private Long customerId;
   private String customerName;
   private BigDecimal amount;
-  private String paymentMethod;
+  private PaymentMethod paymentMethod;
   private BigDecimal feeAmount;
   private BigDecimal discountAmount;
   private BigDecimal finalAmount;
-  private String status;
+  private OrderStatus status;
   private String createdAt;
   private String updatedAt;
   private String cancelReason;
 
+  
+  private static final DateTimeFormatter DATE_FORMATTER =
+      DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+  public OrderResponse(Order order){
+    this.orderId = order.getOrderId();
+    this.customerId = order.getCustomerId();
+    this.customerName = order.getCustomerName();
+    this.amount = order.getAmount();
+    this.paymentMethod = order.getPaymentMethod();
+    this.feeAmount = order.getFeeAmount();
+    this.discountAmount = order.getDiscountAmount();
+    this.finalAmount = order.getFinalAmount();
+    this.status = order.getStatus();
+    this.createdAt =
+        order.getCreatedAt() != null ? order.getCreatedAt().format(DATE_FORMATTER) : null;
+    this.updatedAt =
+        order.getUpdatedAt() != null ? order.getUpdatedAt().format(DATE_FORMATTER) : null;
+    this.cancelReason = order.getCancelReason();
+  }
 
   public String getOrderId() {
     return orderId;
@@ -46,10 +70,10 @@ public class OrderDetailResponse {
     this.amount = amount;
   }
 
-  public String getPaymentMethod() {
+  public PaymentMethod getPaymentMethod() {
     return paymentMethod;
   }
-  public void setPaymentMethod(String paymentMethod) {
+  public void setPaymentMethod(PaymentMethod paymentMethod) {
     this.paymentMethod = paymentMethod;
   }
 
@@ -74,10 +98,10 @@ public class OrderDetailResponse {
     this.finalAmount = finalAmount;
   }
 
-  public String getStatus() {
+  public OrderStatus getStatus() {
     return status;
   }
-  public void setStatus(String status) {
+  public void setStatus(OrderStatus status) {
     this.status = status;
   }
 
@@ -102,3 +126,4 @@ public class OrderDetailResponse {
     this.cancelReason = cancelReason;
   }
 }
+

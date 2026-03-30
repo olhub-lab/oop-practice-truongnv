@@ -1,19 +1,17 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.CreateOrderRequest;
-import com.example.demo.dto.request.ListOrderRequest;
-import com.example.demo.dto.response.CancelOrderResponse;
-import com.example.demo.dto.response.OrderDetailResponse;
-import com.example.demo.dto.response.PageResponse;
+import com.example.demo.dto.PageResponse;
+import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
 
 public interface OrderService {
+  Order create(Order order);
 
-  Order createOrder(CreateOrderRequest request);
+  Order update(Order order);
 
-  OrderDetailResponse getOrderDetail(String orderId);
+  Order get(String id);
 
-  CancelOrderResponse cancelOrder(String orderId, String reason);
+  void delete(String id);
 
-  PageResponse<OrderDetailResponse> listOrders(ListOrderRequest request);
+  PageResponse<Order> findAll(OrderFilterRequest filter);
 }
