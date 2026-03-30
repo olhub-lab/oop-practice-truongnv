@@ -1,6 +1,7 @@
 package com.example.demo.persistence.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -14,7 +15,30 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public void save(Order order) {
+    if (order == null || order.getOrderId() == null) {
+      return;
+    }
     database.put(order.getOrderId(), order);
-    logger.info(() -> "save param: " + order.getOrderId());
+    logger.info(() -> "Order saved with id: " + order.getOrderId());
+  }
+
+  @Override
+  public void update(Order order) {
+    
+  }
+
+  @Override
+  public void delete(String id) {
+    
+  }
+
+  @Override
+  public Order get(String id) {
+    return null;
+  }
+
+  @Override
+  public List<Order> filter() {
+    return null;
   }
 }

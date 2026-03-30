@@ -1,14 +1,9 @@
 package com.example.demo.service.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import java.util.List;
 import java.util.logging.Logger;
 
-import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.model.Order;
-import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
@@ -23,12 +18,35 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public Order createOrder(Order order) {
-    logger.info(() -> "Service executing save order: " + order.getOrderId());
-
+  public Order create(Order order) {
+    logger.info(() -> "Creating order with id: " + order.getOrderId());
     orderRepository.save(order);
+
     return order;
   }
 
+  @Override
+  public Order update(Order order) {
+    logger.info(() -> "Updating order with id " + order.getOrderId());
+
+    orderRepository.update(order);
+
+    return order;
+  }
+
+  @Override
+  public Order get(String orderId) {
+    return null;
+  }
+
+  @Override
+  public void delete(String orderId) {
+
+  }
+
+  @Override
+  public List<Order> filter() {
+    return null;
+  }
 
 }
