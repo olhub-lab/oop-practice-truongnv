@@ -15,21 +15,21 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public void save(Order order) {
+    logger.info(() -> "Order saved with id: " + order.getOrderId());
     if (order == null || order.getOrderId() == null) {
       return;
     }
     database.put(order.getOrderId(), order);
-    logger.info(() -> "Order saved with id: " + order.getOrderId());
   }
 
   @Override
   public void update(Order order) {
-    
+
   }
 
   @Override
   public void delete(String id) {
-    
+
   }
 
   @Override
