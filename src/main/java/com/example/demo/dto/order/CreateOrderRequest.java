@@ -10,38 +10,17 @@ public class CreateOrderRequest {
   private BigDecimal amount;
   private PaymentMethod paymentMethod;
 
-  public CreateOrderRequest() {
-  }
+  public CreateOrderRequest() {}
 
-  public Long getCustomerId() {
-    return customerId;
-  }
+  public Long getCustomerId() { return customerId; }
+  public void setCustomerId(Long customerId) { this.customerId = customerId; }
 
-  public void setCustomerId(Long customerId) {
-    this.customerId = customerId;
-  }
+  public String getCustomerName() { return customerName; }
+  public void setCustomerName(String customerName) { this.customerName = customerName; }
 
-  public String getCustomerName() {
-    return customerName;
-  }
+  public BigDecimal getAmount() { return amount; }
+  public void setAmount(BigDecimal amount) { this.amount = amount; }
 
-  public void setCustomerName(String customerName) {
-    this.customerName = customerName;
-  }
-
-  public BigDecimal getAmount() {
-    return amount;
-  }
-
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
-  }
-
-  public PaymentMethod getPaymentMethod() {
-    return paymentMethod;
-  }
-
-  public void setPaymentMethod(PaymentMethod paymentMethod) {
-    this.paymentMethod = paymentMethod;
-  }
+  public PaymentMethod getPaymentMethod() { return paymentMethod; }
+  public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
 }

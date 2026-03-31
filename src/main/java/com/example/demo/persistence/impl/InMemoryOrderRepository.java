@@ -15,12 +15,11 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public void save(Order order) {
+    logger.info(() -> "Order saved with id: " + order.getOrderId());
     if (order == null || order.getOrderId() == null) {
       return;
     }
     database.put(order.getOrderId(), order);
-    logger.info(() -> "Order saved with id: " + order.getOrderId());
-
   }
 
   @Override
@@ -34,7 +33,7 @@ public class InMemoryOrderRepository implements OrderRepository {
   }
 
   @Override
-  public Order get(String id) {
+  public Order findById(String id) {
     logger.info(() -> "get order with id: " + id);
     return database.get(id);
   }
