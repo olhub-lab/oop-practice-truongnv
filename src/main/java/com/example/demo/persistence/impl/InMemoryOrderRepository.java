@@ -1,11 +1,13 @@
 package com.example.demo.persistence.impl;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
 import com.example.demo.persistence.OrderRepository;
 
@@ -16,26 +18,60 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public void save(Order order) {
+    logger.info(() -> "Order saved with id: " + order.getOrderId());
+    if (order == null || order.getOrderId() == null) {
+      return;
+    }
     database.put(order.getOrderId(), order);
   }
 
   @Override
   public void update(Order order) {
-    database.put(order.getOrderId(), order);
   }
 
   @Override
   public void delete(String id) {
-    database.remove(id);
+
   }
 
   @Override
-  public Order get(String id) {
+  public Order findById(String id) {
+    logger.info(() -> "get order with id: " + id);
     return database.get(id);
   }
 
   @Override
-  public List<Order> findAll() {
-    return new ArrayList<>(database.values());
+  public List<Order> findAll(OrderFilterRequest request) {
+    logger.info(() -> "Finding all orders with filter " + request);
+
+    if (request == null) {
+      return database.values().stream()
+          .sorted(Comparator.comparing(Order::getCreatedAt).reversed())
+          .collect(Collectors.toList());
+    }
+
+    return database.values().stream()
+        .filter(order -> {
+          if (request.getStatus() != null
+              && !request.getStatus().equals(order.getStatus())) {
+            return false;
+          }
+          if (request.getPaymentMethod() != null
+              && !request.getPaymentMethod().equals(order.getPaymentMethod())) {
+            return false;
+          }
+          if (request.getFromDate() != null
+              && order.getCreatedAt().toLocalDate().isBefore(request.getFromDate())) {
+            return false;
+          }
+          if (request.getToDate() != null
+              && order.getCreatedAt().toLocalDate().isAfter(request.getToDate())) {
+            return false;
+          }
+          return true;
+        })
+        .sorted(Comparator.comparing(Order::getCreatedAt).reversed())
+        .collect(Collectors.toList());
   }
+
 }

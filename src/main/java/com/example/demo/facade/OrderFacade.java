@@ -1,6 +1,7 @@
 package com.example.demo.facade;
 
-import com.example.demo.dto.PageResponse;
+import java.util.List;
+
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
@@ -15,5 +16,5 @@ public interface OrderFacade {
 
   void deleteOrder(String orderId);
 
-  PageResponse<OrderResponse> filterOrders(OrderFilterRequest request);
+  List<OrderResponse> filterOrders(OrderFilterRequest request);
 }

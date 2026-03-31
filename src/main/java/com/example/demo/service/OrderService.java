@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.PageResponse;
+import java.util.List;
+
+import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
 
 public interface OrderService {
-  Order create(Order order);
+  Order create(CreateOrderRequest request);
 
   Order update(Order order);
 
@@ -13,5 +15,5 @@ public interface OrderService {
 
   void delete(String id);
 
-  PageResponse<Order> findAll(OrderFilterRequest filter);
+  List<Order> findAll(OrderFilterRequest request);
 }
