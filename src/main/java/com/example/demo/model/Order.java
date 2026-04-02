@@ -3,6 +3,7 @@ package com.example.demo.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.demo.exception.InvalidOrderStatusException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
@@ -55,7 +56,7 @@ public class Order {
 
   public void cancel(String reason) {
     if (this.status != OrderStatus.PENDING) {
-      throw new ValidationException(
+      throw new InvalidOrderStatusException(
           String.format("Can not cancel order %s because it in status %s", this.orderId,
               this.status.name()));
     }

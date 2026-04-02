@@ -3,38 +3,35 @@ package com.example.demo.dto.order;
 import com.example.demo.model.enums.OrderStatus;
 
 public class CancelOrderResponse {
-    private String orderId;
-    private OrderStatus previousStatus;
-    private OrderStatus currentStatus;
-    private String cancelTime;
-    private String message;
+  private String orderId;
+  private OrderStatus status;
+  private String cancelReason;
+  private String cancelTime;
 
-    public CancelOrderResponse(String orderId, OrderStatus previousStatus, OrderStatus currentStatus, String cancelTime,
-            String message) {
-        this.orderId = orderId;
-        this.previousStatus = previousStatus;
-        this.currentStatus = currentStatus;
-        this.cancelTime = cancelTime;
-        this.message = message;
-    }
+  public CancelOrderResponse(
+      String orderId,
+      OrderStatus status,
+      String cancelReason,
+      String cancelTime) {
+    this.orderId = orderId;
+    this.status = status;
+    this.cancelReason = cancelReason;
+    this.cancelTime = cancelTime;
+  }
 
-    public String getOrderId() {
-        return orderId;
-    }
+  public String getOrderId() {
+    return orderId;
+  }
 
-    public OrderStatus getPreviousStatus() {
-        return previousStatus;
-    }
+  public OrderStatus getStatus() {
+    return status;
+  }
 
-    public OrderStatus getCurrentStatus() {
-        return currentStatus;
-    }
+  public String getCancelReason() {
+    return cancelReason;
+  }
 
-    public String getCancelTime() {
-        return cancelTime;
-    }
-
-    public String getMessage() {
-        return message;
-    }
+  public String getCancelTime() {
+    return cancelTime;
+  }
 }

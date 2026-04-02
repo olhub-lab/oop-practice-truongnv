@@ -28,6 +28,10 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public void update(Order order) {
+    if (order != null && order.getOrderId() != null) {
+      logger.info(() -> "Updating order in database with id: " + order.getOrderId());
+      database.put(order.getOrderId(), order);
+    }
   }
 
   @Override
