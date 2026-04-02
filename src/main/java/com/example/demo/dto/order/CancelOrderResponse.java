@@ -9,7 +9,8 @@ public class CancelOrderResponse {
     private String cancelTime;
     private String message;
 
-    public CancelOrderResponse(String orderId, OrderStatus previousStatus, OrderStatus currentStatus, String cancelTime, String message) {
+    public CancelOrderResponse(String orderId, OrderStatus previousStatus, OrderStatus currentStatus, String cancelTime,
+            String message) {
         this.orderId = orderId;
         this.previousStatus = previousStatus;
         this.currentStatus = currentStatus;
@@ -17,9 +18,23 @@ public class CancelOrderResponse {
         this.message = message;
     }
 
-    public String getOrderId() { return orderId; }
-    public OrderStatus getPreviousStatus() { return previousStatus; }
-    public OrderStatus getCurrentStatus() { return currentStatus; }
-    public String getCancelTime() { return cancelTime; }
-    public String getMessage() { return message; }
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public OrderStatus getPreviousStatus() {
+        return previousStatus;
+    }
+
+    public OrderStatus getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public String getCancelTime() {
+        return cancelTime;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

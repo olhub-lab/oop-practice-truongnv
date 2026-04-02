@@ -2,7 +2,7 @@ package com.example.demo.facade;
 
 import java.util.List;
 
-import com.example.demo.dto.order.CancelOrderResponse;
+
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
@@ -18,6 +18,4 @@ public interface OrderFacade {
   void deleteOrder(String orderId);
 
   List<OrderResponse> filterOrders(OrderFilterRequest request);
-
-  CancelOrderResponse cancelOrder(String orderId, String reason);
 }
