@@ -53,7 +53,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
   @Override
   public List<OrderResponse> filterOrders(OrderFilterRequest request) {
-    logger.info("Filtering orders");
+    logger.info(() -> "Filtering orders param: " + request);
     return orderService.findAll(request).stream()
         .map(OrderResponse::new)
         .collect(Collectors.toList());

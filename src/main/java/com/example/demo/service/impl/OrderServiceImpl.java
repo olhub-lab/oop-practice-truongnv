@@ -113,12 +113,12 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public List<Order> findAll(OrderFilterRequest request) {
-    logger.info("Finding all orders with filter");
-    if (request == null) {
-      request = new OrderFilterRequest();
-    }
-    validateFilterRequest(request);
-    return orderRepository.findAll(request);
+    final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
+
+    logger.info(() -> "findAll param: " + actualRequest);
+
+    validateFilterRequest(actualRequest);
+    return orderRepository.findAll(actualRequest);
   }
 
 }
