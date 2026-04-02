@@ -15,26 +15,33 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public void save(Order order) {
-    
+    if (order == null || order.getOrderId() == null) {
+      logger.warning(() -> "Attempted to save null order or order without id");
+      return;
+    }
+    logger.info(() -> "Saving order with id: " + order.getOrderId());
+    database.put(order.getOrderId(), order);
   }
 
   @Override
   public void update(Order order) {
-    
+
   }
 
   @Override
   public void delete(String id) {
-    
+
   }
 
   @Override
-  public Order get(String id) {
-    return null;
+  public Order findById(String id) {
+    logger.info(() -> "get order with id: " + id);
+    return database.get(id);
   }
 
   @Override
   public List<Order> filter() {
     return null;
   }
+
 }
