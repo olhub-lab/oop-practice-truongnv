@@ -2,6 +2,7 @@ package com.example.demo.facade.impl;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
@@ -52,9 +53,9 @@ public class OrderFacadeImpl implements OrderFacade {
 
   @Override
   public List<OrderResponse> filterOrders(OrderFilterRequest request) {
-    logger.info(() -> "Filtering orders with request " + request);
-
-    return null;
+    logger.info(() -> "Filtering orders param: " + request);
+    return orderService.findAll(request).stream()
+        .map(OrderResponse::new)
+        .collect(Collectors.toList());
   }
-
 }

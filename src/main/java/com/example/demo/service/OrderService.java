@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.util.List;
 
 import com.example.demo.dto.order.CreateOrderRequest;
+import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
 
 public interface OrderService {
@@ -14,5 +15,5 @@ public interface OrderService {
 
   void delete(String id);
 
-  List<Order> filter();
+  List<Order> findAll(OrderFilterRequest request);
 }

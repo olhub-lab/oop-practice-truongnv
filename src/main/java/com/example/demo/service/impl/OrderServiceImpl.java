@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.example.demo.dto.order.CreateOrderRequest;
+import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
@@ -103,9 +104,21 @@ public class OrderServiceImpl implements OrderService {
 
   }
 
+  private void validateFilterRequest(OrderFilterRequest request) {
+    if (request.getFromDate() != null && request.getToDate() != null
+        && request.getFromDate().isAfter(request.getToDate())) {
+      throw new ValidationException("fromDate must be before or equal to toDate.");
+    }
+  }
+
   @Override
-  public List<Order> filter() {
-    return null;
+  public List<Order> findAll(OrderFilterRequest request) {
+    final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
+
+    logger.info(() -> "findAll param: " + actualRequest);
+
+    validateFilterRequest(actualRequest);
+    return orderRepository.findAll(actualRequest);
   }
 
 }

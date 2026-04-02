@@ -2,6 +2,7 @@ package com.example.demo.persistence;
 
 import java.util.List;
 
+import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
 
 public interface OrderRepository {
@@ -14,6 +15,6 @@ public interface OrderRepository {
 
   void delete(String id);
 
-  List<Order> filter();
+  List<Order> findAll(OrderFilterRequest request);
 
 }

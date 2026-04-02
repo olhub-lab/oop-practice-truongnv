@@ -3,6 +3,7 @@ package com.example.demo.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.demo.exception.ValidationException;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
 
@@ -38,17 +39,36 @@ public class Order {
     this.updatedAt = builder.updatedAt;
   }
 
-  public void calculateFinalAmount() {
+  public void calculateFees() {
     if (this.amount == null || this.paymentMethod == null) {
       return;
     }
-
     BigDecimal feeRate = this.paymentMethod.getFeeRate();
     BigDecimal discountRate = this.paymentMethod.getDiscountRate();
 
     this.feeAmount = this.amount.multiply(feeRate);
     this.discountAmount = this.amount.multiply(discountRate);
     this.finalAmount = this.amount.add(this.feeAmount).subtract(this.discountAmount);
+  }
+
+  private static final int MAX_CANCEL_REASON_LENGTH = 500;
+
+  public void cancel(String reason) {
+    if (this.status != OrderStatus.PENDING) {
+      throw new ValidationException(
+          String.format("Can not cancel order %s because it in status %s", this.orderId,
+              this.status.name()));
+    }
+    if (reason == null || reason.trim().isEmpty()) {
+      throw new ValidationException("Cancel reason cannot be null or empty.");
+    }
+
+    if (reason.length() > MAX_CANCEL_REASON_LENGTH) {
+      throw new ValidationException("The reason can not be above 500 characters");
+    }
+    this.status = OrderStatus.CANCELLED;
+    this.cancelReason = reason;
+    this.updatedAt = LocalDateTime.now();
   }
 
   public String getOrderId() {
@@ -222,7 +242,7 @@ public class Order {
 
     public Order build() {
       Order order = new Order(this);
-      order.calculateFinalAmount();
+      order.calculateFees();
       return order;
     }
   }
