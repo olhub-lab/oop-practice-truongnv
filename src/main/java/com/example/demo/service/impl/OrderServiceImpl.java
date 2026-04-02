@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
 
   private static int counter = 1;
 
-  private static final String DATE_FORMAT_PATTERN = "dd/MM/yyyy HH:mm:ss";
+  private static final String DATE_FORMAT_PATTERN = "yyyyMMdd";
 
   private static String generateOrderId() {
     String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN));
@@ -56,8 +56,8 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order create(CreateOrderRequest request) {
-    validateCreateRequest(request);
     logger.info(() -> "Creating order with customer name: " + request.getCustomerName());
+    validateCreateRequest(request);
     LocalDateTime now = LocalDateTime.now();
     Order order = Order.builder()
         .orderId(generateOrderId())
