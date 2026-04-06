@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
@@ -58,4 +59,18 @@ public class OrderFacadeImpl implements OrderFacade {
         .map(OrderResponse::new)
         .collect(Collectors.toList());
   }
+
+  @Override
+  public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
+    logger.info(() -> "cancelOrder param: orderId=" + orderId);
+
+    Order order = orderService.cancelOrder(orderId, cancelReason);
+
+    return new CancelOrderResponse(
+        order.getOrderId(),
+        order.getStatus(),
+        order.getCancelReason(),
+        order.getUpdatedAt().toString());
+  }
+
 }

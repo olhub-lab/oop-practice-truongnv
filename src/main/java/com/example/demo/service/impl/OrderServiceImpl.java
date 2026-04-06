@@ -104,6 +104,23 @@ public class OrderServiceImpl implements OrderService {
 
   }
 
+  @Override
+  public Order cancelOrder(String orderId, String cancelReason) {
+    logger.info(() -> "cancelOrder param: orderId=" + orderId + ", reason=" + cancelReason);
+
+    if (orderId == null || orderId.isBlank()) {
+      throw new ValidationException("orderId must not be empty");
+    }
+    if (cancelReason == null || cancelReason.isBlank()) {
+      throw new ValidationException("cancelReason must not be empty");
+    }
+    Order order = get(orderId);
+    order.cancel(cancelReason);
+    orderRepository.update(order);
+
+    return order;
+  }
+
   private void validateFilterRequest(OrderFilterRequest request) {
     if (request.getFromDate() != null && request.getToDate() != null
         && request.getFromDate().isAfter(request.getToDate())) {

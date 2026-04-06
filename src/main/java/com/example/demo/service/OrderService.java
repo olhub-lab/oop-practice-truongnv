@@ -16,4 +16,6 @@ public interface OrderService {
   void delete(String id);
 
   List<Order> findAll(OrderFilterRequest request);
+
+  Order cancelOrder(String orderId, String reason);
 }
