@@ -2,7 +2,9 @@ package com.example.demo.facade.impl;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
@@ -40,7 +42,8 @@ public class OrderFacadeImpl implements OrderFacade {
   public OrderResponse getOrder(String orderId) {
     logger.info(() -> "Getting order with id " + orderId);
 
-    return null;
+    Order order = orderService.get(orderId);
+    return new OrderResponse(order);
   }
 
   @Override
@@ -51,9 +54,23 @@ public class OrderFacadeImpl implements OrderFacade {
 
   @Override
   public List<OrderResponse> filterOrders(OrderFilterRequest request) {
-    logger.info(() -> "Filtering orders with request " + request);
+    logger.info(() -> "Filtering orders param: " + request);
+    return orderService.findAll(request).stream()
+        .map(OrderResponse::new)
+        .collect(Collectors.toList());
+  }
 
-    return null;
+  @Override
+  public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
+    logger.info(() -> "cancelOrder param: orderId=" + orderId);
+
+    Order order = orderService.cancelOrder(orderId, cancelReason);
+
+    return new CancelOrderResponse(
+        order.getOrderId(),
+        order.getStatus(),
+        order.getCancelReason(),
+        order.getUpdatedAt().toString());
   }
 
 }

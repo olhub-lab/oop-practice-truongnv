@@ -1,7 +1,8 @@
 package com.example.demo.dto.order;
 
-import com.example.demo.model.enums.PaymentMethod;
 import java.math.BigDecimal;
+
+import com.example.demo.model.enums.PaymentMethod;
 
 public class CreateOrderRequest {
   private Long customerId;

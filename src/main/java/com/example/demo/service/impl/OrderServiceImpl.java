@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.example.demo.dto.order.CreateOrderRequest;
+import com.example.demo.dto.order.OrderFilterRequest;
+import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
@@ -84,7 +86,17 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order get(String orderId) {
-    return null;
+    logger.info(() -> "Getting order with id: " + orderId);
+
+    if (orderId == null || orderId.trim().isEmpty()) {
+      throw new ValidationException("orderId cannot be null or empty.");
+    }
+    Order order = orderRepository.findById(orderId);
+    if (order == null) {
+      throw new OrderNotFoundException(orderId);
+    }
+
+    return order;
   }
 
   @Override
@@ -93,8 +105,37 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<Order> filter() {
-    return null;
+  public Order cancelOrder(String orderId, String cancelReason) {
+    logger.info(() -> "cancelOrder param: orderId=" + orderId + ", reason=" + cancelReason);
+
+    if (orderId == null || orderId.isBlank()) {
+      throw new ValidationException("orderId must not be empty");
+    }
+    if (cancelReason == null || cancelReason.isBlank()) {
+      throw new ValidationException("cancelReason must not be empty");
+    }
+    Order order = get(orderId);
+    order.cancel(cancelReason);
+    orderRepository.update(order);
+
+    return order;
+  }
+
+  private void validateFilterRequest(OrderFilterRequest request) {
+    if (request.getFromDate() != null && request.getToDate() != null
+        && request.getFromDate().isAfter(request.getToDate())) {
+      throw new ValidationException("fromDate must be before or equal to toDate.");
+    }
+  }
+
+  @Override
+  public List<Order> findAll(OrderFilterRequest request) {
+    final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
+
+    logger.info(() -> "findAll param: " + actualRequest);
+
+    validateFilterRequest(actualRequest);
+    return orderRepository.findAll(actualRequest);
   }
 
 }
