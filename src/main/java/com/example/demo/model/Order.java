@@ -40,6 +40,19 @@ public class Order {
     this.updatedAt = builder.updatedAt;
   }
 
+  public void validatePendingStatus() {
+    if (this.status != OrderStatus.PENDING) {
+      throw new InvalidOrderStatusException(
+          String.format("Can not process payment for order %s because it in status %s", this.orderId,
+              this.status.name()));
+    }
+  }
+
+  public void applyPaymentResult(OrderStatus result) {
+    this.status = result;
+    this.updatedAt = LocalDateTime.now();
+  }
+
   public void calculateFees() {
     if (this.amount == null || this.paymentMethod == null) {
       return;

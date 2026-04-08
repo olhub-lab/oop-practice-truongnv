@@ -9,6 +9,7 @@ import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.order.UpdateOrderRequest;
+import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.facade.OrderFacade;
 import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
@@ -73,4 +74,15 @@ public class OrderFacadeImpl implements OrderFacade {
         order.getUpdatedAt().toString());
   }
 
+  @Override
+  public PaymentOrderResponse processPayment(String orderId) {
+    logger.info(() -> "processPayment param: orderId=" + orderId);
+
+    Order order = orderService.processPayment(orderId);
+
+    return new PaymentOrderResponse(
+        order.getOrderId(),
+        order.getStatus(),
+        order.getUpdatedAt().toString());
+  }
 }

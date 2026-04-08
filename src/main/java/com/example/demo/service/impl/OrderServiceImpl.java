@@ -12,6 +12,8 @@ import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
+import com.example.demo.payment.PaymentPort;
+import com.example.demo.payment.PaymentPortFactory;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
@@ -20,9 +22,11 @@ public class OrderServiceImpl implements OrderService {
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
 
   private final OrderRepository orderRepository;
+  private final PaymentPortFactory paymentPortFactory;
 
-  public OrderServiceImpl(OrderRepository orderRepository) {
+  public OrderServiceImpl(OrderRepository orderRepository, PaymentPortFactory paymentPortFactory) {
     this.orderRepository = orderRepository;
+    this.paymentPortFactory = paymentPortFactory;
   }
 
   private static int counter = 1;
@@ -136,6 +140,26 @@ public class OrderServiceImpl implements OrderService {
 
     validateFilterRequest(actualRequest);
     return orderRepository.findAll(actualRequest);
+  }
+
+  @Override
+  public Order processPayment(String orderId) {
+    logger.info(() -> "processPayment param: orderId=" + orderId);
+
+    if (orderId == null || orderId.isBlank()) {
+      throw new ValidationException("orderId must not be empty");
+    }
+
+    Order order = get(orderId);
+    order.validatePendingStatus();
+
+    PaymentPort paymentPort = paymentPortFactory.getPaymentPort(order.getPaymentMethod());
+    OrderStatus status = paymentPort.process(order);
+
+    order.applyPaymentResult(status);
+    orderRepository.update(order);
+
+    return order;
   }
 
 }
