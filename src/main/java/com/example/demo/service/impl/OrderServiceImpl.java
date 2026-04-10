@@ -13,7 +13,7 @@ import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.payment.PaymentPort;
-import com.example.demo.payment.PaymentPortFactory;
+import com.example.demo.payment.PaymentPortResolver;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
@@ -22,11 +22,11 @@ public class OrderServiceImpl implements OrderService {
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
 
   private final OrderRepository orderRepository;
-  private final PaymentPortFactory paymentPortFactory;
+  private final PaymentPortResolver paymentPortResolver;
 
-  public OrderServiceImpl(OrderRepository orderRepository, PaymentPortFactory paymentPortFactory) {
+  public OrderServiceImpl(OrderRepository orderRepository, PaymentPortResolver paymentPortResolver) {
     this.orderRepository = orderRepository;
-    this.paymentPortFactory = paymentPortFactory;
+    this.paymentPortResolver = paymentPortResolver;
   }
 
   private static int counter = 1;
@@ -153,8 +153,8 @@ public class OrderServiceImpl implements OrderService {
     Order order = get(orderId);
     order.validatePendingStatus();
 
-    PaymentPort paymentPort = paymentPortFactory.getPaymentPort(order.getPaymentMethod());
-    OrderStatus status = paymentPort.process(order);
+    PaymentPort port = paymentPortResolver.getPaymentPort(order.getPaymentMethod());
+    OrderStatus status = port.process(order);
 
     order.applyPaymentResult(status);
     orderRepository.update(order);

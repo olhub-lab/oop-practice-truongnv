@@ -11,6 +11,8 @@ public class MomoProvider {
     logger.info(() -> "Requesting payment with walletId: " + walletId + ", money: " + money);
     boolean success = money.compareTo(MAX_PAYMENT_AMOUNT) <= 0;
 
+    logger.info(() -> "requestPayment result: " + (success ? "SUCCESS" : "FAILED")
+        + " for wallet " + walletId);
     return success;
   }
 }

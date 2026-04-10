@@ -13,6 +13,8 @@ public class BankProvider {
   public String transfer(String accountNumber, BigDecimal amount, String description) {
     logger.info(() -> "transfer accountNumber=" + accountNumber + ", amount=" + amount);
     String status = amount.compareTo(MAX_TRANSFER_AMOUNT) <= 0 ? STATUS_SUCCESS : STATUS_FAILED;
+
+    logger.info(() -> "transfer result: " + status + " for account " + accountNumber);
     return status;
   }
 }
