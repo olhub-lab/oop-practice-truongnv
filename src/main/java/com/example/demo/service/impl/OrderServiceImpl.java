@@ -146,18 +146,14 @@ public class OrderServiceImpl implements OrderService {
   public Order processPayment(String orderId) {
     logger.info(() -> "processPayment param: orderId=" + orderId);
 
-    if (orderId == null || orderId.isBlank()) {
-      throw new ValidationException("orderId must not be empty");
-    }
-
-    Order order = get(orderId);
+    Order order = this.get(orderId);
     order.validatePendingStatus();
 
-    PaymentPort port = paymentPortResolver.getPaymentPort(order.getPaymentMethod());
+    PaymentPort port = this.paymentPortResolver.getPaymentPort(order.getPaymentMethod());
     OrderStatus status = port.process(order);
 
     order.applyPaymentResult(status);
-    orderRepository.update(order);
+    this.orderRepository.update(order);
 
     return order;
   }
