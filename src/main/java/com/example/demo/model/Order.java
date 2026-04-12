@@ -40,6 +40,11 @@ public class Order {
     this.updatedAt = builder.updatedAt;
   }
 
+  public void applyPaymentResult(OrderStatus result) {
+    this.status = result;
+    this.updatedAt = LocalDateTime.now();
+  }
+
   public void calculateFees() {
     if (this.amount == null || this.paymentMethod == null) {
       return;
@@ -54,18 +59,25 @@ public class Order {
 
   private static final int MAX_CANCEL_REASON_LENGTH = 500;
 
-  public void cancel(String reason) {
+  private void ensurePendingStatus(String action) {
     if (this.status != OrderStatus.PENDING) {
       throw new InvalidOrderStatusException(
-          String.format("Can not cancel order %s because it in status %s", this.orderId,
-              this.status.name()));
+          String.format("Cannot %s order %s because it is in status %s",
+              action, this.orderId, this.status.name()));
     }
+  }
+
+  public void validatePendingStatus() {
+    ensurePendingStatus("process payment");
+  }
+
+  public void cancel(String reason) {
+    ensurePendingStatus("cancel");
     if (reason == null || reason.trim().isEmpty()) {
       throw new ValidationException("Cancel reason cannot be null or empty.");
     }
-
     if (reason.length() > MAX_CANCEL_REASON_LENGTH) {
-      throw new ValidationException("The reason can not be above 500 characters");
+      throw new ValidationException("Cancel reason cannot exceed 500 characters.");
     }
     this.status = OrderStatus.CANCELLED;
     this.cancelReason = reason;

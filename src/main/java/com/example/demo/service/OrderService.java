@@ -18,4 +18,6 @@ public interface OrderService {
   List<Order> findAll(OrderFilterRequest request);
 
   Order cancelOrder(String orderId, String reason);
+
+  Order processPayment(String orderId);
 }
