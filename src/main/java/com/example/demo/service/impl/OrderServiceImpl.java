@@ -6,6 +6,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.exception.OrderNotFoundException;
@@ -17,6 +20,7 @@ import com.example.demo.payment.PaymentPortResolver;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
+@Service
 public class OrderServiceImpl implements OrderService {
 
   private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
@@ -60,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public Order create(CreateOrderRequest request) {
     logger.info(() -> "Creating order with customer name: " + request.getCustomerName());
     validateCreateRequest(request);
@@ -80,6 +85,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Order update(Order order) {
     logger.info(() -> "Updating order with id " + order.getOrderId());
 
@@ -109,6 +115,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public Order cancelOrder(String orderId, String cancelReason) {
     logger.info(() -> "cancelOrder param: orderId=" + orderId + ", reason=" + cancelReason);
 
@@ -133,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Order> findAll(OrderFilterRequest request) {
     final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
 
@@ -143,6 +151,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public Order processPayment(String orderId) {
     logger.info(() -> "processPayment param: orderId=" + orderId);
 

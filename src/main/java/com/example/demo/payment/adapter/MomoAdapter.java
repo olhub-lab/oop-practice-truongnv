@@ -2,11 +2,14 @@ package com.example.demo.payment.adapter;
 
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Component;
+
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.payment.PaymentPort;
 import com.example.demo.payment.provider.MomoProvider;
 
+@Component
 public class MomoAdapter implements PaymentPort {
 
   private static final Logger logger = Logger.getLogger(MomoAdapter.class.getName());

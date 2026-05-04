@@ -1,10 +1,12 @@
 package com.example.demo;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
@@ -12,33 +14,14 @@ import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.facade.OrderFacade;
-import com.example.demo.facade.impl.OrderFacadeImpl;
 import com.example.demo.model.enums.PaymentMethod;
-import com.example.demo.payment.PaymentPort;
-import com.example.demo.payment.PaymentPortFactory;
-import com.example.demo.payment.PaymentPortResolver;
-import com.example.demo.payment.adapter.BankAdapter;
-import com.example.demo.payment.adapter.MomoAdapter;
-import com.example.demo.payment.provider.BankProvider;
-import com.example.demo.payment.provider.MomoProvider;
-import com.example.demo.persistence.OrderRepository;
-import com.example.demo.persistence.impl.InMemoryOrderRepository;
-import com.example.demo.service.OrderService;
-import com.example.demo.service.impl.OrderServiceImpl;
 
+@SpringBootApplication
 public class Main {
 
   public static void main(String[] args) {
-    OrderRepository orderRepository = new InMemoryOrderRepository();
-
-    Map<PaymentMethod, PaymentPort> portMap = new HashMap<>();
-    portMap.put(PaymentMethod.CREDIT_CARD, new BankAdapter(new BankProvider()));
-    portMap.put(PaymentMethod.BANK_TRANSFER, new BankAdapter(new BankProvider()));
-    portMap.put(PaymentMethod.E_WALLET, new MomoAdapter(new MomoProvider()));
-
-    PaymentPortResolver paymentPortResolver = new PaymentPortFactory(portMap);
-    OrderService orderService = new OrderServiceImpl(orderRepository, paymentPortResolver);
-    OrderFacade orderFacade = new OrderFacadeImpl(orderService);
+    ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+    OrderFacade orderFacade = context.getBean(OrderFacade.class);
 
     Scanner scanner = new Scanner(System.in);
     boolean running = true;
@@ -73,6 +56,7 @@ public class Main {
     }
 
     scanner.close();
+    context.close();
   }
 
   private static void printMenu() {
