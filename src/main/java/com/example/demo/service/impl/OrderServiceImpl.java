@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
@@ -33,13 +34,15 @@ public class OrderServiceImpl implements OrderService {
     this.paymentPortResolver = paymentPortResolver;
   }
 
-  private static int counter = 1;
-
-  private static final String DATE_FORMAT_PATTERN = "yyyyMMdd";
-
   private static String generateOrderId() {
-    String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN));
-    return String.format("ORD-%s-%05d", date, counter++);
+    String date = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    String shortId = UUID.randomUUID()
+        .toString()
+        .replace("-", "")
+        .substring(0, 8)
+        .toUpperCase();
+    return String.format("ORD-%s-%s", date, shortId);
   }
 
   private void validateCreateRequest(CreateOrderRequest request) {
@@ -85,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional
   public Order update(Order order) {
     logger.info(() -> "Updating order with id " + order.getOrderId());
 
@@ -110,8 +113,14 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public void delete(String orderId) {
-
+    logger.info(() -> "Deleting order with id " + orderId);
+    if (orderId == null || orderId.trim().isEmpty()) {
+      throw new ValidationException("orderId cannot be null or empty.");
+    }
+    get(orderId);
+    orderRepository.delete(orderId);
   }
 
   @Override
