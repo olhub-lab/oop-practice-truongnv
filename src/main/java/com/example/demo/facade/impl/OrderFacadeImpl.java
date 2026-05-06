@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
@@ -14,6 +16,7 @@ import com.example.demo.facade.OrderFacade;
 import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
 
+@Component
 public class OrderFacadeImpl implements OrderFacade {
   private static final Logger logger = Logger.getLogger(OrderFacadeImpl.class.getName());
 
@@ -36,7 +39,18 @@ public class OrderFacadeImpl implements OrderFacade {
   public OrderResponse updateOrder(String orderId, UpdateOrderRequest request) {
     logger.info(() -> "Updating order with id " + orderId);
 
-    return null;
+    Order order = orderService.get(orderId);
+    if (request.getAmount() != null) {
+      order.setAmount(request.getAmount());
+    }
+    if (request.getStatus() != null) {
+      order.setStatus(request.getStatus());
+    }
+    if (request.getCancelReason() != null) {
+      order.setCancelReason(request.getCancelReason());
+    }
+    Order updatedOrder = orderService.update(order);
+    return new OrderResponse(updatedOrder);
   }
 
   @Override
@@ -50,7 +64,7 @@ public class OrderFacadeImpl implements OrderFacade {
   @Override
   public void deleteOrder(String orderId) {
     logger.info(() -> "Deleting order with id " + orderId);
-
+    orderService.delete(orderId);
   }
 
   @Override
