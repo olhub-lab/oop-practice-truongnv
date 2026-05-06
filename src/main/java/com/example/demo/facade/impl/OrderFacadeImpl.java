@@ -39,7 +39,18 @@ public class OrderFacadeImpl implements OrderFacade {
   public OrderResponse updateOrder(String orderId, UpdateOrderRequest request) {
     logger.info(() -> "Updating order with id " + orderId);
 
-    return null;
+    Order order = orderService.get(orderId);
+    if (request.getAmount() != null) {
+      order.setAmount(request.getAmount());
+    }
+    if (request.getStatus() != null) {
+      order.setStatus(request.getStatus());
+    }
+    if (request.getCancelReason() != null) {
+      order.setCancelReason(request.getCancelReason());
+    }
+    Order updatedOrder = orderService.update(order);
+    return new OrderResponse(updatedOrder);
   }
 
   @Override
@@ -53,7 +64,7 @@ public class OrderFacadeImpl implements OrderFacade {
   @Override
   public void deleteOrder(String orderId) {
     logger.info(() -> "Deleting order with id " + orderId);
-
+    orderService.delete(orderId);
   }
 
   @Override

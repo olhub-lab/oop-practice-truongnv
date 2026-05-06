@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,12 @@ public class OrderController {
   public ResponseEntity<String> createOrder(@RequestBody CreateOrderRequest createOrderRequest) {
     OrderResponse orderResponse = orderFacade.createOrder(createOrderRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse.getOrderId());
+  }
+
+  @GetMapping("/{orderId}")
+  public ResponseEntity<OrderResponse> getOrder(@PathVariable String orderId) {
+    OrderResponse orderResponse = orderFacade.getOrder(orderId);
+    return ResponseEntity.ok(orderResponse);
   }
 
 }
