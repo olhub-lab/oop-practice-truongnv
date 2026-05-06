@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.order.CancelOrderRequest;
+import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
@@ -78,6 +80,13 @@ public class OrderController {
   public ResponseEntity<OrderResponse> deleteOrder(@PathVariable String orderId) {
     orderFacade.deleteOrder(orderId);
     return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{orderId}/cancel")
+  public ResponseEntity<CancelOrderResponse> cancelOrder(@PathVariable String orderId,
+      @RequestBody CancelOrderRequest cancelOrderRequest) {
+    CancelOrderResponse cancelOrderResponse = orderFacade.cancelOrder(orderId, cancelOrderRequest.getReason());
+    return ResponseEntity.ok(cancelOrderResponse);
   }
 
 }
