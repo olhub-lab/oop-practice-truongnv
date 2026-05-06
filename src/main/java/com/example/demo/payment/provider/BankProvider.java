@@ -3,6 +3,9 @@ package com.example.demo.payment.provider;
 import java.math.BigDecimal;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class BankProvider {
   private static final Logger logger = Logger.getLogger(BankProvider.class.getName());
 
