@@ -21,6 +21,7 @@ import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.order.UpdateOrderRequest;
+import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.facade.OrderFacade;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
@@ -87,6 +88,12 @@ public class OrderController {
       @RequestBody CancelOrderRequest cancelOrderRequest) {
     CancelOrderResponse cancelOrderResponse = orderFacade.cancelOrder(orderId, cancelOrderRequest.getReason());
     return ResponseEntity.ok(cancelOrderResponse);
+  }
+
+  @PostMapping("/{orderId}/payment")
+  public ResponseEntity<PaymentOrderResponse> processPayment(@PathVariable String orderId) {
+    PaymentOrderResponse paymentOrderResponse = orderFacade.processPayment(orderId);
+    return ResponseEntity.ok(paymentOrderResponse);
   }
 
 }
