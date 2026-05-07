@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
@@ -14,6 +16,7 @@ import com.example.demo.facade.OrderFacade;
 import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
 
+@Component
 public class OrderFacadeImpl implements OrderFacade {
   private static final Logger logger = Logger.getLogger(OrderFacadeImpl.class.getName());
 
