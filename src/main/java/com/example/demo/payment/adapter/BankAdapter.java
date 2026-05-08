@@ -1,6 +1,7 @@
 package com.example.demo.payment.adapter;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
@@ -11,7 +12,7 @@ import com.example.demo.payment.provider.BankProvider;
 
 @Component
 public class BankAdapter implements PaymentPort {
-  private static final Logger logger = Logger.getLogger(BankAdapter.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(BankAdapter.class);
   private static final String SUCCESS_RESPONSE = "SUCCESS";
   private final BankProvider bankProvider;
 
@@ -21,7 +22,7 @@ public class BankAdapter implements PaymentPort {
 
   @Override
   public OrderStatus process(Order order) {
-    logger.info(() -> "process param: orderId=" + order.getOrderId());
+    logger.info("process param: orderId={}", order.getOrderId());
     String result = bankProvider.transfer(
         order.getOrderId(),
         order.getFinalAmount(),
