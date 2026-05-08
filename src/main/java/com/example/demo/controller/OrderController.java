@@ -11,6 +11,8 @@ import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.facade.OrderFacade;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -22,9 +24,9 @@ public class OrderController {
   }
 
   @PostMapping
-  public ResponseEntity<String> createOrder(@RequestBody CreateOrderRequest createOrderRequest) {
+  public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
     OrderResponse orderResponse = orderFacade.createOrder(createOrderRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse.getOrderId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
   }
 
 }
