@@ -1,6 +1,7 @@
 package com.example.demo.payment.adapter;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import com.example.demo.payment.provider.MomoProvider;
 @Component
 public class MomoAdapter implements PaymentPort {
 
-  private static final Logger logger = Logger.getLogger(MomoAdapter.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(MomoAdapter.class);
 
   private final MomoProvider momoProvider;
 
@@ -22,7 +23,7 @@ public class MomoAdapter implements PaymentPort {
 
   @Override
   public OrderStatus process(Order order) {
-    logger.info(() -> "process param: orderId=" + order.getOrderId());
+    logger.info("process param: orderId={}", order.getOrderId());
     boolean success = momoProvider.requestPayment(
         order.getOrderId(),
         order.getFinalAmount());
