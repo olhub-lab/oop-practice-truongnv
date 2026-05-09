@@ -1,11 +1,11 @@
 package com.example.demo.service.impl;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ import com.example.demo.service.OrderService;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-  private static final Logger logger = Logger.getLogger(OrderServiceImpl.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
   private final OrderRepository orderRepository;
   private final PaymentPortResolver paymentPortResolver;
@@ -45,32 +45,12 @@ public class OrderServiceImpl implements OrderService {
     return String.format("ORD-%s-%s", date, shortId);
   }
 
-  private void validateCreateRequest(CreateOrderRequest request) {
-    if (request == null) {
-      throw new ValidationException("Request cannot be null.");
-    }
-    if (request.getCustomerId() == null || request.getCustomerId() <= 0) {
-      throw new ValidationException("CustomerId cannot be null and must be > 0.");
-    }
-    if (request.getCustomerName() == null || request.getCustomerName().trim().isEmpty()) {
-      throw new ValidationException("CustomerName cannot be empty.");
-    }
-    if (request.getCustomerName().length() > 100) {
-      throw new ValidationException("CustomerName cannot be longer than 100 characters.");
-    }
-    if (request.getPaymentMethod() == null) {
-      throw new ValidationException("PaymentMethod cannot be null.");
-    }
-    if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-      throw new ValidationException("Amount must be greater than 0.");
-    }
-  }
 
   @Override
   @Transactional
   public Order create(CreateOrderRequest request) {
-    logger.info(() -> "Creating order with customer name: " + request.getCustomerName());
-    validateCreateRequest(request);
+    logger.info("Creating order with customer name: {}", request.getCustomerName());
+    
     LocalDateTime now = LocalDateTime.now();
     Order order = Order.builder()
         .orderId(generateOrderId())
@@ -90,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Order update(Order order) {
-    logger.info(() -> "Updating order with id " + order.getOrderId());
+    logger.info("Updating order with id {}", order.getOrderId());
 
     orderRepository.update(order);
 
@@ -99,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Order get(String orderId) {
-    logger.info(() -> "Getting order with id: " + orderId);
+    logger.info("Getting order with id: {}", orderId);
 
     if (orderId == null || orderId.trim().isEmpty()) {
       throw new ValidationException("orderId cannot be null or empty.");
@@ -115,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public void delete(String orderId) {
-    logger.info(() -> "Deleting order with id " + orderId);
+    logger.info("Deleting order with id {}", orderId);
     if (orderId == null || orderId.trim().isEmpty()) {
       throw new ValidationException("orderId cannot be null or empty.");
     }
@@ -126,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Order cancelOrder(String orderId, String cancelReason) {
-    logger.info(() -> "cancelOrder param: orderId=" + orderId + ", reason=" + cancelReason);
+    logger.info("cancelOrder param: orderId={}, reason={}", orderId, cancelReason);
 
     if (orderId == null || orderId.isBlank()) {
       throw new ValidationException("orderId must not be empty");
@@ -153,7 +133,7 @@ public class OrderServiceImpl implements OrderService {
   public List<Order> findAll(OrderFilterRequest request) {
     final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
 
-    logger.info(() -> "findAll param: " + actualRequest);
+    logger.info("findAll param: {}", actualRequest);
 
     validateFilterRequest(actualRequest);
     return orderRepository.findAll(actualRequest);
@@ -162,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Order processPayment(String orderId) {
-    logger.info(() -> "processPayment param: orderId=" + orderId);
+    logger.info("processPayment param: orderId={}", orderId);
 
     Order order = this.get(orderId);
     order.validatePendingStatus();
