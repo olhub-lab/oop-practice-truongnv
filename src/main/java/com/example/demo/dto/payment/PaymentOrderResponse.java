@@ -13,6 +13,18 @@ public class PaymentOrderResponse {
     this.processedAt = processedAt;
   }
 
+  public void setOrderId(String orderId) {
+    this.orderId = orderId;
+  }
+
+  public void setStatus(OrderStatus status) {
+    this.status = status;
+  }
+
+  public void setProcessedAt(String processedAt) {
+    this.processedAt = processedAt;
+  }
+
   public String getOrderId() {
     return orderId;
   }
