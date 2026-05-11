@@ -4,11 +4,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
@@ -21,10 +20,11 @@ import com.example.demo.payment.PaymentPortResolver;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
-
-  private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
   private final OrderRepository orderRepository;
   private final PaymentPortResolver paymentPortResolver;
@@ -45,12 +45,11 @@ public class OrderServiceImpl implements OrderService {
     return String.format("ORD-%s-%s", date, shortId);
   }
 
-
   @Override
   @Transactional
   public Order create(CreateOrderRequest request) {
-    logger.info("Creating order with customer name: {}", request.getCustomerName());
-    
+    log.info("Creating order with customer name: {}", request.getCustomerName());
+
     LocalDateTime now = LocalDateTime.now();
     Order order = Order.builder()
         .orderId(generateOrderId())
@@ -68,20 +67,10 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @Transactional
-  public Order update(Order order) {
-    logger.info("Updating order with id {}", order.getOrderId());
-
-    orderRepository.update(order);
-
-    return order;
-  }
-
-  @Override
   public Order get(String orderId) {
-    logger.info("Getting order with id: {}", orderId);
+    log.info("Getting order with id: {}", orderId);
 
-    if (orderId == null || orderId.trim().isEmpty()) {
+    if (!StringUtils.hasText(orderId)) {
       throw new ValidationException("orderId cannot be null or empty.");
     }
     Order order = orderRepository.findById(orderId);
@@ -94,24 +83,13 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void delete(String orderId) {
-    logger.info("Deleting order with id {}", orderId);
-    if (orderId == null || orderId.trim().isEmpty()) {
-      throw new ValidationException("orderId cannot be null or empty.");
-    }
-    get(orderId);
-    orderRepository.delete(orderId);
-  }
-
-  @Override
-  @Transactional
   public Order cancelOrder(String orderId, String cancelReason) {
-    logger.info("cancelOrder param: orderId={}, reason={}", orderId, cancelReason);
+    log.info("cancelOrder param: orderId={}, reason={}", orderId, cancelReason);
 
-    if (orderId == null || orderId.isBlank()) {
+    if (!StringUtils.hasText(orderId)) {
       throw new ValidationException("orderId must not be empty");
     }
-    if (cancelReason == null || cancelReason.isBlank()) {
+    if (!StringUtils.hasText(cancelReason)) {
       throw new ValidationException("cancelReason must not be empty");
     }
     Order order = get(orderId);
@@ -133,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
   public List<Order> findAll(OrderFilterRequest request) {
     final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
 
-    logger.info("findAll param: {}", actualRequest);
+    log.info("findAll param: {}", actualRequest);
 
     validateFilterRequest(actualRequest);
     return orderRepository.findAll(actualRequest);
@@ -142,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Order processPayment(String orderId) {
-    logger.info("processPayment param: orderId={}", orderId);
+    log.info("processPayment param: orderId={}", orderId);
 
     Order order = this.get(orderId);
     order.validatePendingStatus();
