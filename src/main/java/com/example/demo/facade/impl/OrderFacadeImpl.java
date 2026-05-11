@@ -61,7 +61,7 @@ public class OrderFacadeImpl implements OrderFacade {
         order.getOrderId(),
         order.getStatus(),
         order.getCancelReason(),
-        order.getUpdatedAt().toString());
+        order.getUpdatedAt());
   }
 
   @Override

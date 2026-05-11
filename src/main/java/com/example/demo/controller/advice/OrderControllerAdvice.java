@@ -16,11 +16,6 @@ public class OrderControllerAdvice {
 
   @ExceptionHandler(OrderNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleOrderNotFound(OrderNotFoundException e) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-  }
-
-  @ExceptionHandler(OrderNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handleNotFound(OrderNotFoundException e) {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(Map.of("error", e.getMessage()));
@@ -39,4 +34,5 @@ public class OrderControllerAdvice {
         .status(HttpStatus.CONFLICT)
         .body(Map.of("error", e.getMessage()));
   }
+
 }

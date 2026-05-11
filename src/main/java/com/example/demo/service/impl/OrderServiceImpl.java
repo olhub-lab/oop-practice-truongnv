@@ -84,13 +84,10 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Order cancelOrder(String orderId, String cancelReason) {
-    log.info("cancelOrder param: orderId={}, reason={}", orderId, cancelReason);
+    log.info("cancelOrder param: orderId={}, hasTextReason={}", orderId, StringUtils.hasText(cancelReason));
 
     if (!StringUtils.hasText(orderId)) {
       throw new ValidationException("orderId must not be empty");
-    }
-    if (!StringUtils.hasText(cancelReason)) {
-      throw new ValidationException("cancelReason must not be empty");
     }
     Order order = get(orderId);
     order.cancel(cancelReason);
