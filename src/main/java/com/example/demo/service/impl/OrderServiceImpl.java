@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order cancelOrder(String orderId, String cancelReason) {
-        log.info("cancelOrder param: orderId={}, reason={}", orderId, cancelReason);
+        log.info("cancelOrder param: orderId = {}, reason = {}", orderId, cancelReason);
 
         if (!StringUtils.hasText(orderId)) {
             throw new ValidationException("orderId must not be empty");
@@ -116,7 +116,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order processPayment(String orderId) {
-        log.info("processPayment param: orderId={}", orderId);
+        log.info("processPayment param: orderId = {}", orderId);
 
         Order order = this.get(orderId);
         order.validatePendingStatus();

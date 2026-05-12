@@ -24,7 +24,7 @@ public class OrderController {
 
   @GetMapping("/{id}")
   public ResponseEntity<OrderResponse> getOrder(@PathVariable String id) {
-    log.info("Received get order request: id={}", id);
+    log.info("Received get order request: id = {}", id);
 
     OrderResponse orderResponse = orderFacade.getOrder(id);
     return ResponseEntity.ok(orderResponse);
