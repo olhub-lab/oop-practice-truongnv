@@ -11,14 +11,14 @@ import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.UnsupportedPaymentMethodException;
 import com.example.demo.exception.ValidationException;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 @RestControllerAdvice
 public class OrderControllerAdvice {
 
   @ExceptionHandler(OrderNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleOrderNotFound(OrderNotFoundException e) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(Map.of("error", e.getMessage()));
   }
 
   @ExceptionHandler(ValidationException.class)

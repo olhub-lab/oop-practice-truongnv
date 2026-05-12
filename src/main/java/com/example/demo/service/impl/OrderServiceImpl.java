@@ -35,9 +35,10 @@ public class OrderServiceImpl implements OrderService {
         this.paymentPortResolver = paymentPortResolver;
     }
 
-    private String generateOrderId(LocalDateTime createdAt) {
-        String date = createdAt.format(DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN));
+    private String generateOrderId(LocalDateTime now) {
+        String date = now.format(DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN));
         long sequence = orderRepository.nextOrderSequence();
+
         return String.format("ORD-%s-%05d", date, sequence);
     }
 
@@ -59,6 +60,7 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderRepository.save(order);
+
         return order;
     }
 
@@ -69,6 +71,7 @@ public class OrderServiceImpl implements OrderService {
         if (!StringUtils.hasText(orderId)) {
             throw new ValidationException("orderId cannot be null or empty.");
         }
+
         Order order = orderRepository.findById(orderId);
         if (order == null) {
             throw new OrderNotFoundException(orderId);
@@ -80,14 +83,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order cancelOrder(String orderId, String cancelReason) {
-        log.info("cancelOrder param: orderId = {}, reason = {}", orderId, cancelReason);
+        log.info("cancelOrder param: orderId={}, reason={}", orderId, cancelReason);
 
         if (!StringUtils.hasText(orderId)) {
             throw new ValidationException("orderId must not be empty");
         }
+
         if (!StringUtils.hasText(cancelReason)) {
             throw new ValidationException("cancelReason must not be empty");
         }
+
         Order order = get(orderId);
         order.cancel(cancelReason);
         orderRepository.update(order);
@@ -95,39 +100,40 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
-    private void validateFilterRequest(OrderFilterRequest request) {
-        if (request.getFromDate() != null && request.getToDate() != null
-                && request.getFromDate().isAfter(request.getToDate())) {
-            throw new ValidationException("fromDate must be before or equal to toDate.");
-        }
-    }
-
     @Override
     @Transactional(readOnly = true)
     public List<Order> findAll(OrderFilterRequest request) {
-        final OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
+        OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
 
         log.info("findAll param: {}", actualRequest);
 
         validateFilterRequest(actualRequest);
+
         return orderRepository.findAll(actualRequest);
     }
 
     @Override
     @Transactional
     public Order processPayment(String orderId) {
-        log.info("processPayment param: orderId = {}", orderId);
+        log.info("processPayment param: orderId={}", orderId);
 
-        Order order = this.get(orderId);
+        Order order = get(orderId);
         order.validatePendingStatus();
 
-        PaymentPort port = this.paymentPortResolver.getPaymentPort(order.getPaymentMethod());
+        PaymentPort port = paymentPortResolver.getPaymentPort(order.getPaymentMethod());
         OrderStatus status = port.process(order);
 
         order.applyPaymentResult(status);
-        this.orderRepository.update(order);
+        orderRepository.update(order);
 
         return order;
     }
 
+    private void validateFilterRequest(OrderFilterRequest request) {
+        if (request.getFromDate() != null
+                && request.getToDate() != null
+                && request.getFromDate().isAfter(request.getToDate())) {
+            throw new ValidationException("fromDate must be before or equal to toDate.");
+        }
+    }
 }
