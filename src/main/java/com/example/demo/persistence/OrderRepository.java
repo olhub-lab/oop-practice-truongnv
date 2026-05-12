@@ -7,6 +7,8 @@ import com.example.demo.model.Order;
 
 public interface OrderRepository {
 
+  long nextOrderSequence();
+
   void save(Order order);
 
   void update(Order order);

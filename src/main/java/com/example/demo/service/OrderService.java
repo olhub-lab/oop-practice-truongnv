@@ -9,11 +9,7 @@ import com.example.demo.model.Order;
 public interface OrderService {
   Order create(CreateOrderRequest request);
 
-  Order update(Order order);
-
   Order get(String id);
-
-  void delete(String id);
 
   List<Order> findAll(OrderFilterRequest request);
 

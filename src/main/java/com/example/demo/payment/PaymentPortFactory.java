@@ -1,13 +1,14 @@
 package com.example.demo.payment;
 
 import java.util.Map;
-import java.util.logging.Logger;
 
 import com.example.demo.exception.UnsupportedPaymentMethodException;
 import com.example.demo.model.enums.PaymentMethod;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class PaymentPortFactory implements PaymentPortResolver {
-  private static final Logger logger = Logger.getLogger(PaymentPortFactory.class.getName());
 
   private final Map<PaymentMethod, PaymentPort> portMap;
 
@@ -17,7 +18,7 @@ public class PaymentPortFactory implements PaymentPortResolver {
 
   @Override
   public PaymentPort getPaymentPort(PaymentMethod paymentMethod) {
-    logger.info(() -> "getPaymentPort param: " + paymentMethod);
+    log.info("getPaymentPort param: {}", paymentMethod);
     PaymentPort port = portMap.get(paymentMethod);
     if (port == null) {
       throw new UnsupportedPaymentMethodException(
