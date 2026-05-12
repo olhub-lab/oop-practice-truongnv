@@ -53,7 +53,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
   @Override
   public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
-    log.info("cancelOrder param: orderId={}", orderId);
+    log.info("cancelOrder param: orderId = {}", orderId);
 
     Order order = orderService.cancelOrder(orderId, cancelReason);
 
@@ -66,7 +66,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
   @Override
   public PaymentOrderResponse processPayment(String orderId) {
-    log.info("processPayment param: orderId={}", orderId);
+    log.info("processPayment param: orderId= {}", orderId);
 
     Order order = orderService.processPayment(orderId);
 

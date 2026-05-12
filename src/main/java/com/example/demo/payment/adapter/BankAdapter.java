@@ -21,7 +21,7 @@ public class BankAdapter implements PaymentPort {
 
   @Override
   public OrderStatus process(Order order) {
-    log.info("process param: orderId={}", order.getOrderId());
+    log.info("process param: orderId= {}", order.getOrderId());
     String result = bankProvider.transfer(
         order.getOrderId(),
         order.getFinalAmount(),
