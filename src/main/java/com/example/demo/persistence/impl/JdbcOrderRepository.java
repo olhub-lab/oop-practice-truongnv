@@ -49,6 +49,11 @@ public class JdbcOrderRepository implements OrderRepository {
       """;
   private static final String FIND_ORDER_BY_ID_SQL = "SELECT * FROM orders WHERE order_id = :orderId";
   private static final String DELETE_ORDER_BY_ID_SQL = "DELETE FROM orders WHERE order_id = :id";
+  private static final String FIND_LAST_ORDER_SEQUENCE_SQL = """
+      SELECT COALESCE(MAX(CAST(SUBSTRING(order_id, LENGTH(order_id) - 4, 5) AS INTEGER)), 0)
+      FROM orders
+      WHERE order_id LIKE 'ORD-%'
+      """;
   private static final String FIND_ALL_ORDERS_BASE_SQL = "SELECT * FROM orders WHERE 1=1";
   private static final String FILTER_BY_STATUS_SQL = " AND status = :status";
   private static final String FILTER_BY_PAYMENT_METHOD_SQL = " AND payment_method = :paymentMethod";
@@ -63,6 +68,16 @@ public class JdbcOrderRepository implements OrderRepository {
 
   public JdbcOrderRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+  }
+
+  @Override
+  public long nextOrderSequence() {
+    log.info("get next order sequence");
+    Long lastSequence = namedParameterJdbcTemplate.queryForObject(
+        FIND_LAST_ORDER_SEQUENCE_SQL,
+        new MapSqlParameterSource(),
+        Long.class);
+    return (lastSequence != null ? lastSequence : 0L) + 1;
   }
 
   @Override

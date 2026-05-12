@@ -21,7 +21,7 @@ public class MomoAdapter implements PaymentPort {
 
   @Override
   public OrderStatus process(Order order) {
-    log.info("process param: orderId={}", order.getOrderId());
+    log.info("process param: orderId = {}", order.getOrderId());
     boolean success = momoProvider.requestPayment(
         order.getOrderId(),
         order.getFinalAmount());
