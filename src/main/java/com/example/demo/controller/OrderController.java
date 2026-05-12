@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
   private final OrderFacade orderFacade;
@@ -22,11 +22,11 @@ public class OrderController {
     this.orderFacade = orderFacade;
   }
 
-  @GetMapping("/{orderId}")
-  public ResponseEntity<OrderResponse> getOrder(@PathVariable String orderId) {
-    log.info("Received get order request: orderId={}", orderId);
+  @GetMapping("/{id}")
+  public ResponseEntity<OrderResponse> getOrder(@PathVariable String id) {
+    log.info("Received get order request: id={}", id);
 
-    OrderResponse orderResponse = orderFacade.getOrder(orderId);
+    OrderResponse orderResponse = orderFacade.getOrder(id);
     return ResponseEntity.ok(orderResponse);
   }
 }

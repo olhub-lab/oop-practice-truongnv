@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.example.demo.dto.order.OrderFilterRequest;
@@ -16,6 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 public class InMemoryOrderRepository implements OrderRepository {
 
   private final Map<String, Order> database = new HashMap<>();
+  private final AtomicLong orderCounter = new AtomicLong();
+
+  @Override
+  public long nextOrderSequence() {
+    log.info("get next order sequence");
+    return orderCounter.incrementAndGet();
+  }
 
   @Override
   public void save(Order order) {
