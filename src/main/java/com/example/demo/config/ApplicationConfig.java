@@ -6,22 +6,23 @@ import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.demo.adapter.BankPaymentAdapter;
+import com.example.demo.adapter.MomoPaymentAdapter;
 import com.example.demo.model.enums.PaymentMethod;
-import com.example.demo.payment.PaymentPort;
-import com.example.demo.payment.PaymentPortFactory;
-import com.example.demo.payment.PaymentPortResolver;
-import com.example.demo.payment.adapter.BankAdapter;
-import com.example.demo.payment.adapter.MomoAdapter;
+import com.example.demo.port.PaymentPort;
+import com.example.demo.port.PaymentPortFactory;
+import com.example.demo.port.PaymentPortResolver;
 
 @Configuration
 public class ApplicationConfig {
 
   @Bean
-  public PaymentPortResolver paymentPortResolver(BankAdapter bankAdapter, MomoAdapter momoAdapter) {
+  public PaymentPortResolver paymentPortResolver(BankPaymentAdapter bankPaymentAdapter,
+      MomoPaymentAdapter momoPaymentAdapter) {
     Map<PaymentMethod, PaymentPort> portMap = new EnumMap<>(PaymentMethod.class);
-    portMap.put(PaymentMethod.CREDIT_CARD, bankAdapter);
-    portMap.put(PaymentMethod.BANK_TRANSFER, bankAdapter);
-    portMap.put(PaymentMethod.E_WALLET, momoAdapter);
+    portMap.put(PaymentMethod.CREDIT_CARD, bankPaymentAdapter);
+    portMap.put(PaymentMethod.BANK_TRANSFER, bankPaymentAdapter);
+    portMap.put(PaymentMethod.E_WALLET, momoPaymentAdapter);
     return new PaymentPortFactory(portMap);
   }
 }
