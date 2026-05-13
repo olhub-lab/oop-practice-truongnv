@@ -11,7 +11,6 @@ import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.facade.OrderFacade;
-import com.example.demo.model.Order;
 import com.example.demo.service.OrderService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,52 +29,34 @@ public class OrderFacadeImpl implements OrderFacade {
   public OrderResponse createOrder(CreateOrderRequest request) {
     log.info("Creating order for customer: {}", request.getCustomerName());
 
-    Order createdOrder = orderService.create(request);
-
-    return new OrderResponse(createdOrder);
+    return orderService.createOrder(request);
   }
 
   @Override
   public OrderResponse getOrder(String orderId) {
     log.info("Getting order with id {}", orderId);
 
-    Order order = orderService.get(orderId);
-    return new OrderResponse(order);
+    return orderService.getOrder(orderId);
   }
 
   @Override
   public List<OrderResponse> filterOrders(OrderFilterRequest request) {
     log.info("Filtering orders param: {}", request);
-    return orderService.findAll(request).stream()
-        .map(OrderResponse::new)
-        .collect(Collectors.toList());
+    
+    return orderService.findAll(request);
   }
 
   @Override
   public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
     log.info("cancelOrder param: orderId = {}", orderId);
 
-    Order order = orderService.cancelOrder(orderId, cancelReason);
-
-    return new CancelOrderResponse(
-        order.getOrderId(),
-        order.getStatus(),
-        order.getCancelReason(),
-        order.getUpdatedAt());
+    return orderService.cancelOrder(orderId, cancelReason);
   }
 
   @Override
   public PaymentOrderResponse processPayment(String orderId) {
     log.info("processPayment param: orderId = {}", orderId);
 
-    Order order = orderService.processPayment(orderId);
-
-    return new PaymentOrderResponse(
-        order.getOrderId(),
-        order.getStatus(),
-        order.getPaymentMethod(),
-        order.getAmount(),
-        order.getFinalAmount(),
-        order.getUpdatedAt());
+    return orderService.processPayment(orderId);
   }
 }

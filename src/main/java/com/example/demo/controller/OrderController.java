@@ -27,6 +27,7 @@ public class OrderController {
     log.info("processPayment param: orderId = {}", orderId);
 
     PaymentOrderResponse paymentOrderResponse = orderFacade.processPayment(orderId);
+
     return ResponseEntity.ok(paymentOrderResponse);
   }
 
