@@ -15,8 +15,11 @@ import com.example.demo.facade.OrderFacade;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
   private final OrderFacade orderFacade;
@@ -46,5 +49,4 @@ public class OrderController {
     }
     return ResponseEntity.ok(orderFacade.filterOrders(orderFilterRequest));
   }
-
 }

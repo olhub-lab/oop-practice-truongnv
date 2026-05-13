@@ -4,33 +4,41 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
 import com.example.demo.persistence.OrderRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class InMemoryOrderRepository implements OrderRepository {
 
-  private static final Logger logger = LoggerFactory.getLogger(InMemoryOrderRepository.class);
   private final Map<String, Order> database = new HashMap<>();
+  private final AtomicLong orderCounter = new AtomicLong();
+
+  @Override
+  public long nextOrderSequence() {
+    log.info("get next order sequence");
+    return orderCounter.incrementAndGet();
+  }
 
   @Override
   public void save(Order order) {
     if (order == null || order.getOrderId() == null) {
-      logger.warn("Attempted to save null order or order without id");
+      log.warn("Attempted to save null order or order without id");
       return;
     }
-    logger.info("Saving order with id: {}", order.getOrderId());
+    log.info("Saving order with id: {}", order.getOrderId());
     database.put(order.getOrderId(), order);
   }
 
   @Override
   public void update(Order order) {
     if (order != null && order.getOrderId() != null) {
-      logger.info("Updating order in database with id: {}", order.getOrderId());
+      log.info("Updating order in database with id: {}", order.getOrderId());
       database.put(order.getOrderId(), order);
     }
   }
@@ -42,13 +50,13 @@ public class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public Order findById(String id) {
-    logger.info("get order with id: {}", id);
+    log.info("get order with id: {}", id);
     return database.get(id);
   }
 
   @Override
   public List<Order> findAll(OrderFilterRequest request) {
-    logger.info("Finding all orders with filter {}", request);
+    log.info("Finding all orders with filter {}", request);
 
     if (request == null) {
       return database.values().stream()

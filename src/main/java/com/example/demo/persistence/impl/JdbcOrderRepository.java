@@ -4,8 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,11 +19,47 @@ import com.example.demo.model.enums.PaymentMethod;
 import com.example.demo.persistence.OrderRepository;
 
 import io.micrometer.common.lang.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 public class JdbcOrderRepository implements OrderRepository {
 
-  private static final Logger logger = LoggerFactory.getLogger(JdbcOrderRepository.class);
+  private static final String INSERT_ORDER_SQL = """
+      INSERT INTO orders (
+        order_id, customer_id, customer_name, amount, payment_method,
+        fee_amount, discount_amount, final_amount, status,
+        created_at, updated_at, cancel_reason
+      ) VALUES (:orderId, :customerId, :customerName, :amount, :paymentMethod,
+        :feeAmount, :discountAmount, :finalAmount, :status, :createdAt, :updatedAt, :cancelReason)
+      """;
+  private static final String UPDATE_ORDER_SQL = """
+      UPDATE orders
+      SET customer_id = :customerId,
+          customer_name = :customerName,
+          amount = :amount,
+          payment_method = :paymentMethod,
+          fee_amount = :feeAmount,
+          discount_amount = :discountAmount,
+          final_amount = :finalAmount,
+          status = :status,
+          updated_at = :updatedAt,
+          cancel_reason = :cancelReason
+      WHERE order_id = :orderId
+      """;
+  private static final String FIND_ORDER_BY_ID_SQL = "SELECT * FROM orders WHERE order_id = :orderId";
+  private static final String DELETE_ORDER_BY_ID_SQL = "DELETE FROM orders WHERE order_id = :id";
+  private static final String FIND_LAST_ORDER_SEQUENCE_SQL = """
+      SELECT COALESCE(MAX(CAST(SUBSTRING(order_id, LENGTH(order_id) - 4, 5) AS INTEGER)), 0)
+      FROM orders
+      WHERE order_id LIKE 'ORD-%'
+      """;
+  private static final String FIND_ALL_ORDERS_BASE_SQL = "SELECT * FROM orders WHERE 1=1";
+  private static final String FILTER_BY_STATUS_SQL = " AND status = :status";
+  private static final String FILTER_BY_PAYMENT_METHOD_SQL = " AND payment_method = :paymentMethod";
+  private static final String FILTER_BY_FROM_DATE_SQL = " AND created_at >= :fromDate";
+  private static final String FILTER_BY_TO_DATE_SQL = " AND created_at <= :toDate";
+  private static final String ORDER_BY_CREATED_AT_DESC_SQL = " ORDER BY created_at DESC";
 
   @NonNull
   private static final RowMapper<Order> ORDER_ROW_MAPPER = JdbcOrderRepository::mapRow;
@@ -37,37 +71,25 @@ public class JdbcOrderRepository implements OrderRepository {
   }
 
   @Override
+  public long nextOrderSequence() {
+    log.info("get next order sequence");
+    Long lastSequence = namedParameterJdbcTemplate.queryForObject(
+        FIND_LAST_ORDER_SEQUENCE_SQL,
+        new MapSqlParameterSource(),
+        Long.class);
+    return (lastSequence != null ? lastSequence : 0L) + 1;
+  }
+
+  @Override
   public void save(Order order) {
-    logger.info("Saving order: {}", order.getOrderId());
-    namedParameterJdbcTemplate.update("""
-        INSERT INTO orders (
-          order_id, customer_id, customer_name, amount, payment_method,
-          fee_amount, discount_amount, final_amount, status,
-          created_at, updated_at, cancel_reason
-        ) VALUES (:orderId, :customerId, :customerName, :amount, :paymentMethod,
-          :feeAmount, :discountAmount, :finalAmount, :status, :createdAt, :updatedAt, :cancelReason)
-        """,
-        buildParams(order));
+    log.info("Saving order: {}", order.getOrderId());
+    namedParameterJdbcTemplate.update(INSERT_ORDER_SQL, buildParams(order));
   }
 
   @Override
   public void update(Order order) {
-    logger.info("Updating order: {}", order.getOrderId());
-    int row = namedParameterJdbcTemplate.update("""
-        UPDATE orders
-        SET customer_id = :customerId,
-            customer_name = :customerName,
-            amount = :amount,
-            payment_method = :paymentMethod,
-            fee_amount = :feeAmount,
-            discount_amount = :discountAmount,
-            final_amount = :finalAmount,
-            status = :status,
-            updated_at = :updatedAt,
-            cancel_reason = :cancelReason
-        WHERE order_id = :orderId
-        """,
-        buildParams(order));
+    log.info("Updating order: {}", order.getOrderId());
+    int row = namedParameterJdbcTemplate.update(UPDATE_ORDER_SQL, buildParams(order));
 
     if (row == 0)
       throw new OrderNotFoundException(order.getOrderId());
@@ -75,10 +97,10 @@ public class JdbcOrderRepository implements OrderRepository {
 
   @Override
   public Order findById(String id) {
-    logger.info("Getting order with id: {}", id);
+    log.info("Getting order with id: {}", id);
     try {
       return namedParameterJdbcTemplate.queryForObject(
-          "SELECT * FROM orders WHERE order_id = :orderId",
+          FIND_ORDER_BY_ID_SQL,
           new MapSqlParameterSource().addValue("orderId", id),
           ORDER_ROW_MAPPER);
     } catch (EmptyResultDataAccessException e) {
@@ -88,36 +110,36 @@ public class JdbcOrderRepository implements OrderRepository {
 
   @Override
   public void delete(String id) {
-    logger.info("Deleting order with id: {}", id);
-    namedParameterJdbcTemplate.update("DELETE FROM orders WHERE order_id = :id", new MapSqlParameterSource().addValue("id", id));
+    log.info("Deleting order with id: {}", id);
+    namedParameterJdbcTemplate.update(DELETE_ORDER_BY_ID_SQL, new MapSqlParameterSource().addValue("id", id));
   }
 
   @Override
   public List<Order> findAll(OrderFilterRequest request) {
-    logger.info("Finding all orders with filter: {}", request);
-    String sql = "SELECT * FROM orders WHERE 1=1";
+    log.info("Finding all orders with filter: {}", request);
+    String sql = FIND_ALL_ORDERS_BASE_SQL;
     MapSqlParameterSource params = new MapSqlParameterSource();
 
     if (request != null) {
       if (request.getStatus() != null) {
-        sql += " AND status = :status";
+        sql += FILTER_BY_STATUS_SQL;
         params.addValue("status", request.getStatus().name());
       }
       if (request.getPaymentMethod() != null) {
-        sql += " AND payment_method = :paymentMethod";
+        sql += FILTER_BY_PAYMENT_METHOD_SQL;
         params.addValue("paymentMethod", request.getPaymentMethod().name());
       }
       if (request.getFromDate() != null) {
-        sql += " AND created_at >= :fromDate";
+        sql += FILTER_BY_FROM_DATE_SQL;
         params.addValue("fromDate", Timestamp.valueOf(request.getFromDate()));
       }
       if (request.getToDate() != null) {
-        sql += " AND created_at <= :toDate";
+        sql += FILTER_BY_TO_DATE_SQL;
         params.addValue("toDate", Timestamp.valueOf(request.getToDate()));
       }
     }
 
-    sql += " ORDER BY created_at DESC";
+    sql += ORDER_BY_CREATED_AT_DESC_SQL;
     return namedParameterJdbcTemplate.query(sql, params, ORDER_ROW_MAPPER);
   }
 
