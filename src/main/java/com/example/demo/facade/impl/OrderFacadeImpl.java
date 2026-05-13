@@ -30,49 +30,33 @@ public class OrderFacadeImpl implements OrderFacade {
   public OrderResponse createOrder(CreateOrderRequest request) {
     log.info("Creating order for customer: {}", request.getCustomerName());
 
-    Order createdOrder = orderService.create(request);
-
-    return new OrderResponse(createdOrder);
+    return orderService.createOrder(request);
   }
 
   @Override
   public OrderResponse getOrder(String orderId) {
     log.info("Getting order with id {}", orderId);
 
-    Order order = orderService.get(orderId);
-    return new OrderResponse(order);
+    return orderService.getOrder(orderId);
   }
 
   @Override
   public List<OrderResponse> filterOrders(OrderFilterRequest request) {
     log.info("Filtering orders param: {}", request);
-    return orderService.findAll(request).stream()
-        .map(OrderResponse::new)
-        .collect(Collectors.toList());
+    return orderService.findAll(request);
   }
 
   @Override
   public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
     log.info("cancelOrder param: orderId = {}", orderId);
 
-    Order order = orderService.cancelOrder(orderId, cancelReason);
-
-    return new CancelOrderResponse(
-        order.getOrderId(),
-        order.getStatus(),
-        order.getCancelReason(),
-        order.getUpdatedAt());
+    return orderService.cancelOrder(orderId, cancelReason);
   }
 
   @Override
   public PaymentOrderResponse processPayment(String orderId) {
     log.info("processPayment param: orderId= {}", orderId);
 
-    Order order = orderService.processPayment(orderId);
-
-    return new PaymentOrderResponse(
-        order.getOrderId(),
-        order.getStatus(),
-        order.getUpdatedAt().toString());
+    return orderService.processPayment(orderId);
   }
 }

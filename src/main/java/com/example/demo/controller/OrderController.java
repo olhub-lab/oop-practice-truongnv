@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,15 +41,9 @@ public class OrderController {
   public ResponseEntity<CancelOrderResponse> cancelOrder(
       @PathVariable("id") String id,
       @Valid @RequestBody CancelOrderRequest cancelOrderRequest) {
-    String reason = cancelOrderRequest != null ? cancelOrderRequest.getReason() : null;
+    log.info("cancelOrder request: id = {}", id);
 
-    log.info(
-        "cancelOrder request: id={}, hasTextReason={}, lengthReason={}",
-        id,
-        StringUtils.hasText(reason),
-        Integer.valueOf(reason != null ? reason.length() : 0));
-
-    CancelOrderResponse cancelOrderResponse = orderFacade.cancelOrder(id, reason);
+    CancelOrderResponse cancelOrderResponse = orderFacade.cancelOrder(id, cancelOrderRequest.getReason());
 
     return ResponseEntity.ok(cancelOrderResponse);
   }
