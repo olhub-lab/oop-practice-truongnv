@@ -1,21 +1,21 @@
-package com.example.demo.payment.adapter;
+package com.example.demo.adapter;
 
 import org.springframework.stereotype.Component;
 
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
-import com.example.demo.payment.PaymentPort;
-import com.example.demo.payment.provider.MomoProvider;
+import com.example.demo.port.PaymentPort;
+import com.example.demo.provider.MomoProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class MomoAdapter implements PaymentPort {
+public class MomoPaymentAdapter implements PaymentPort {
 
   private final MomoProvider momoProvider;
 
-  public MomoAdapter(MomoProvider momoProvider) {
+  public MomoPaymentAdapter(MomoProvider momoProvider) {
     this.momoProvider = momoProvider;
   }
 

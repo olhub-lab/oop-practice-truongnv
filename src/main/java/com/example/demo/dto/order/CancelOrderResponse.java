@@ -1,18 +1,20 @@
 package com.example.demo.dto.order;
 
+import java.time.LocalDateTime;
+
 import com.example.demo.model.enums.OrderStatus;
 
 public class CancelOrderResponse {
   private String orderId;
   private OrderStatus status;
   private String cancelReason;
-  private String cancelTime;
+  private LocalDateTime cancelTime;
 
   public CancelOrderResponse(
       String orderId,
       OrderStatus status,
       String cancelReason,
-      String cancelTime) {
+      LocalDateTime cancelTime) {
     this.orderId = orderId;
     this.status = status;
     this.cancelReason = cancelReason;
@@ -31,7 +33,7 @@ public class CancelOrderResponse {
     return cancelReason;
   }
 
-  public String getCancelTime() {
+  public LocalDateTime getCancelTime() {
     return cancelTime;
   }
 }
