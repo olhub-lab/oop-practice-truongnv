@@ -66,13 +66,16 @@ public class OrderFacadeImpl implements OrderFacade {
 
   @Override
   public PaymentOrderResponse processPayment(String orderId) {
-    log.info("processPayment param: orderId= {}", orderId);
+    log.info("processPayment param: orderId = {}", orderId);
 
     Order order = orderService.processPayment(orderId);
 
     return new PaymentOrderResponse(
         order.getOrderId(),
         order.getStatus(),
-        order.getUpdatedAt().toString());
+        order.getPaymentMethod(),
+        order.getAmount(),
+        order.getFinalAmount(),
+        order.getUpdatedAt());
   }
 }

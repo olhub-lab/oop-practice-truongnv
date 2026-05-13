@@ -1,6 +1,7 @@
 package com.example.demo.dto.payment;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
@@ -11,27 +12,15 @@ public class PaymentOrderResponse {
   private PaymentMethod paymentMethod;
   private BigDecimal amount;
   private BigDecimal finalAmount;
-  private String processedAt;
+  private LocalDateTime processedAt;
 
   public PaymentOrderResponse(String orderId, OrderStatus status, PaymentMethod paymentMethod, BigDecimal amount,
-      BigDecimal finalAmount, String processedAt) {
+      BigDecimal finalAmount, LocalDateTime processedAt) {
     this.orderId = orderId;
     this.status = status;
     this.paymentMethod = paymentMethod;
     this.amount = amount;
     this.finalAmount = finalAmount;
-    this.processedAt = processedAt;
-  }
-
-  public void setOrderId(String orderId) {
-    this.orderId = orderId;
-  }
-
-  public void setStatus(OrderStatus status) {
-    this.status = status;
-  }
-
-  public void setProcessedAt(String processedAt) {
     this.processedAt = processedAt;
   }
 
@@ -49,6 +38,10 @@ public class PaymentOrderResponse {
 
   public void setStatus(OrderStatus status) {
     this.status = status;
+  }
+
+  public void setProcessedAt(LocalDateTime processedAt) {
+    this.processedAt = processedAt;
   }
 
   public PaymentMethod getPaymentMethod() {
@@ -76,10 +69,6 @@ public class PaymentOrderResponse {
   }
 
   public String getProcessedAt() {
-    return processedAt;
-  }
-
-  public void setProcessedAt(String processedAt) {
-    this.processedAt = processedAt;
+    return processedAt.toString();
   }
 }

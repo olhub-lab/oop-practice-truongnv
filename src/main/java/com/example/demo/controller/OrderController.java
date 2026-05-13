@@ -24,6 +24,8 @@ public class OrderController {
 
   @PostMapping("/{orderId}/payment")
   public ResponseEntity<PaymentOrderResponse> processPayment(@PathVariable String orderId) {
+    log.info("processPayment param: orderId = {}", orderId);
+
     PaymentOrderResponse paymentOrderResponse = orderFacade.processPayment(orderId);
     return ResponseEntity.ok(paymentOrderResponse);
   }

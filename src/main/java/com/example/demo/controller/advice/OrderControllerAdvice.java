@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.demo.exception.InvalidOrderStatusException;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.UnsupportedPaymentMethodException;
 import com.example.demo.exception.ValidationException;
@@ -31,4 +32,8 @@ public class OrderControllerAdvice {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
   }
 
+  @ExceptionHandler(InvalidOrderStatusException.class)
+  public ResponseEntity<Map<String, String>> handleInvalidStatus(InvalidOrderStatusException e) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+  }
 }
