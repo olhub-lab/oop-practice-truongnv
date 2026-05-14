@@ -1,21 +1,21 @@
-package com.example.demo.payment.adapter;
+package com.example.demo.adapter;
 
 import org.springframework.stereotype.Component;
 
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
-import com.example.demo.payment.PaymentPort;
-import com.example.demo.payment.provider.BankProvider;
+import com.example.demo.port.PaymentPort;
+import com.example.demo.provider.BankProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class BankAdapter implements PaymentPort {
+public class BankPaymentAdapter implements PaymentPort {
   private static final String SUCCESS_RESPONSE = "SUCCESS";
   private final BankProvider bankProvider;
 
-  public BankAdapter(BankProvider bankProvider) {
+  public BankPaymentAdapter(BankProvider bankProvider) {
     this.bankProvider = bankProvider;
   }
 
