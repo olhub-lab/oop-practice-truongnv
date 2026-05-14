@@ -17,7 +17,6 @@ import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
-import com.example.demo.model.enums.PaymentMethod;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.port.PaymentPort;
 import com.example.demo.port.PaymentPortResolver;
@@ -114,26 +113,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponse> findAll(String status, String paymentMethod, String fromDate, String toDate) {
-        log.info("findAll param: status = {}, paymentMethod = {}, fromDate = {}, toDate = {}", status,
-                paymentMethod, fromDate, toDate);
+    public List<OrderResponse> findAll(OrderFilterRequest request) {
+        OrderFilterRequest filterRequest = request != null ? request : new OrderFilterRequest();
+        log.info("findAll request: {}", filterRequest);
 
-        OrderFilterRequest request = new OrderFilterRequest();
-        if (status != null) {
-            request.setStatus(OrderStatus.valueOf(status));
-        }
-        if (paymentMethod != null) {
-            request.setPaymentMethod(PaymentMethod.valueOf(paymentMethod));
-        }
-        if (fromDate != null) {
-            request.setFromDate(LocalDateTime.parse(fromDate));
-        }
-        if (toDate != null) {
-            request.setToDate(LocalDateTime.parse(toDate));
-        }
-        validateFilterRequest(request);
+        validateFilterRequest(filterRequest);
 
-        return orderRepository.findAll(request)
+        return orderRepository.findAll(filterRequest)
                 .stream()
                 .map(OrderResponse::new)
                 .toList();

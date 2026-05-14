@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
+import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.facade.OrderFacade;
@@ -38,14 +39,10 @@ public class OrderFacadeImpl implements OrderFacade {
   }
 
   @Override
-  public List<OrderResponse> filterOrders(String status, String paymentMethod, String fromDate, String toDate) {
-    log.info(
-        "Filtering orders param: status = {}, paymentMethod = {}, fromDate = {}, toDate = {}",
-        status,
-        paymentMethod,
-        fromDate,
-        toDate);
-    return orderService.findAll(status, paymentMethod, fromDate, toDate);
+  public List<OrderResponse> filterOrders(OrderFilterRequest request) {
+    log.info("Filtering orders with request: {}", request);
+
+    return orderService.findAll(request);
   }
 
   @Override
