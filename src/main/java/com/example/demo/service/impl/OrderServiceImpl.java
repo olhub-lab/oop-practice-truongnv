@@ -147,6 +147,9 @@ public class OrderServiceImpl implements OrderService {
         return new PaymentOrderResponse(
                 order.getOrderId(),
                 order.getStatus(),
+                order.getPaymentMethod(),
+                order.getAmount(),
+                order.getFinalAmount(),
                 order.getUpdatedAt().toString());
     }
 
