@@ -47,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse createOrder(CreateOrderRequest request) {
+    public OrderResponse create(CreateOrderRequest request) {
         log.info("Creating order with customer name: {}", request.getCustomerName());
 
         LocalDateTime now = LocalDateTime.now();
@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse getOrder(String orderId) {
+    public OrderResponse get(String orderId) {
         log.info("Getting order with id: {}", orderId);
 
         if (!StringUtils.hasText(orderId)) {
