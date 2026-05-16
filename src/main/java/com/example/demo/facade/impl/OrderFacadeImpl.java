@@ -28,14 +28,14 @@ public class OrderFacadeImpl implements OrderFacade {
   public OrderResponse createOrder(CreateOrderRequest request) {
     log.info("Creating order for customer: {}", request.getCustomerName());
 
-    return orderService.createOrder(request);
+    return orderService.create(request);
   }
 
   @Override
   public OrderResponse getOrder(String orderId) {
     log.info("Getting order with id {}", orderId);
 
-    return orderService.getOrder(orderId);
+    return orderService.get(orderId);
   }
 
   @Override

@@ -9,9 +9,9 @@ import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.payment.PaymentOrderResponse;
 
 public interface OrderService {
-  OrderResponse createOrder(CreateOrderRequest request);
+  OrderResponse create(CreateOrderRequest request);
 
-  OrderResponse getOrder(String orderId);
+  OrderResponse get(String orderId);
 
   List<OrderResponse> findAll(OrderFilterRequest request);
 
