@@ -8,11 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
-import com.example.demo.dto.order.OrderResponse;
-import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Order;
@@ -47,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse create(CreateOrderRequest request) {
+    public Order create(CreateOrderRequest request) {
         log.info("Creating order with customer name: {}", request.getCustomerName());
 
         LocalDateTime now = LocalDateTime.now();
@@ -64,11 +61,11 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
 
-        return new OrderResponse(order);
+        return order;
     }
 
     @Override
-    public OrderResponse get(String orderId) {
+    public Order get(String orderId) {
         log.info("Getting order with id: {}", orderId);
 
         if (!StringUtils.hasText(orderId)) {
@@ -80,12 +77,12 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderNotFoundException(orderId);
         }
 
-        return new OrderResponse(order);
+        return order;
     }
 
     @Override
     @Transactional
-    public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
+    public Order cancelOrder(String orderId, String cancelReason) {
         log.info("cancelOrder param: orderId = {}, reason = {}", orderId, cancelReason);
 
         if (!StringUtils.hasText(orderId)) {
@@ -104,31 +101,23 @@ public class OrderServiceImpl implements OrderService {
         order.cancel(cancelReason);
         orderRepository.update(order);
 
-        return new CancelOrderResponse(
-                order.getOrderId(),
-                order.getStatus(),
-                order.getCancelReason(),
-                order.getUpdatedAt());
+        return order;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponse> findAll(OrderFilterRequest request) {
-        OrderFilterRequest actualRequest = request != null ? request : new OrderFilterRequest();
+    public List<Order> findAll(OrderFilterRequest request) {
+        OrderFilterRequest filterRequest = request != null ? request : new OrderFilterRequest();
+        log.info("findAll request: {}", filterRequest);
 
-        log.info("findAll param: {}", actualRequest);
+        validateFilterRequest(filterRequest);
 
-        validateFilterRequest(actualRequest);
-
-        return orderRepository.findAll(actualRequest)
-                .stream()
-                .map(OrderResponse::new)
-                .toList();
+        return orderRepository.findAll(filterRequest);
     }
 
     @Override
     @Transactional
-    public PaymentOrderResponse processPayment(String orderId) {
+    public Order processPayment(String orderId) {
         log.info("processPayment param: orderId = {}", orderId);
 
         Order order = orderRepository.findById(orderId);
@@ -144,13 +133,7 @@ public class OrderServiceImpl implements OrderService {
         order.applyPaymentResult(status);
         orderRepository.update(order);
 
-        return new PaymentOrderResponse(
-                order.getOrderId(),
-                order.getStatus(),
-                order.getPaymentMethod(),
-                order.getAmount(),
-                order.getFinalAmount(),
-                order.getUpdatedAt().toString());
+        return order;
     }
 
     private void validateFilterRequest(OrderFilterRequest request) {

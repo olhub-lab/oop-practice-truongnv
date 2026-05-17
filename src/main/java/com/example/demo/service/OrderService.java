@@ -2,20 +2,18 @@ package com.example.demo.service;
 
 import java.util.List;
 
-import com.example.demo.dto.order.CancelOrderResponse;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
-import com.example.demo.dto.order.OrderResponse;
-import com.example.demo.dto.payment.PaymentOrderResponse;
+import com.example.demo.model.Order;
 
 public interface OrderService {
-  OrderResponse create(CreateOrderRequest request);
+  Order create(CreateOrderRequest request);
 
-  OrderResponse get(String orderId);
+  Order get(String orderId);
 
-  List<OrderResponse> findAll(OrderFilterRequest request);
+  List<Order> findAll(OrderFilterRequest request);
 
-  CancelOrderResponse cancelOrder(String orderId, String reason);
+  Order cancelOrder(String orderId, String reason);
 
-  PaymentOrderResponse processPayment(String orderId);
+  Order processPayment(String orderId);
 }

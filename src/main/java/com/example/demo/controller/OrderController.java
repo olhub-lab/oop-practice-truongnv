@@ -28,11 +28,6 @@ public class OrderController {
     this.orderFacade = orderFacade;
   }
 
-  @GetMapping
-  public ResponseEntity<List<OrderResponse>> filterOrders(@ModelAttribute OrderFilterRequest request) {
-    return ResponseEntity.ok(orderFacade.filterOrders(request));
-  }
-
   @PostMapping("/{id}/payment")
   public ResponseEntity<PaymentOrderResponse> processPayment(@PathVariable String id) {
     log.info("processPayment param: id = {}", id);
