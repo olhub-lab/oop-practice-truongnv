@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
 import com.example.demo.model.Order;
+import com.example.demo.model.enums.OrderStatus;
 
 public interface OrderService {
   Order create(CreateOrderRequest request);
@@ -15,5 +16,6 @@ public interface OrderService {
 
   Order cancelOrder(String orderId, String reason);
 
-  Order processPayment(String orderId);
+  void applyPaymentResult(String orderId, OrderStatus status);
+
 }

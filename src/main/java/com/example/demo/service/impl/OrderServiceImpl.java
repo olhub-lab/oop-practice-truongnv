@@ -117,23 +117,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order processPayment(String orderId) {
-        log.info("processPayment param: orderId = {}", orderId);
+    public void applyPaymentResult(String orderId, OrderStatus status) {
+        log.info("applyPaymentResult param: orderId = {}, status = {}", orderId, status);
 
         Order order = orderRepository.findById(orderId);
         if (order == null) {
             throw new OrderNotFoundException(orderId);
         }
 
-        order.validatePendingStatus();
-
-        PaymentPort port = paymentPortResolver.getPaymentPort(order.getPaymentMethod());
-        OrderStatus status = port.process(order);
-
         order.applyPaymentResult(status);
-        orderRepository.update(order);
 
-        return order;
+        orderRepository.update(order);
     }
 
     private void validateFilterRequest(OrderFilterRequest request) {
