@@ -36,7 +36,7 @@ public class OrderFacadeImpl implements OrderFacade {
     log.info("Creating order for customer: {}", request.getCustomerName());
 
     Order order = orderService.create(request);
-    
+
     return new OrderResponse(order);
   }
 
@@ -76,14 +76,15 @@ public class OrderFacadeImpl implements OrderFacade {
     order.validatePendingStatus();
 
     PaymentPort paymentPort = paymentPortResolver.getPaymentPort(order.getPaymentMethod());
-    
+
     OrderStatus status = paymentPort.process(order);
 
     orderService.applyPaymentResult(orderId, status);
 
     Order updatedOrder = orderService.get(orderId);
 
-    return new PaymentOrderResponse(updatedOrder.getOrderId(), updatedOrder.getStatus(), updatedOrder.getPaymentMethod(), updatedOrder.getAmount(), updatedOrder.getFinalAmount(),
+    return new PaymentOrderResponse(updatedOrder.getOrderId(), updatedOrder.getStatus(),
+        updatedOrder.getPaymentMethod(), updatedOrder.getAmount(), updatedOrder.getFinalAmount(),
         updatedOrder.getUpdatedAt().toString());
   }
 }
