@@ -21,6 +21,22 @@ public class CancelOrderResponse {
     this.cancelTime = cancelTime;
   }
 
+  public void setOrderId(String orderId) {
+    this.orderId = orderId;
+  }
+
+  public void setStatus(OrderStatus status) {
+    this.status = status;
+  }
+
+  public void setCancelReason(String cancelReason) {
+    this.cancelReason = cancelReason;
+  }
+
+  public void setCancelTime(LocalDateTime cancelTime) {
+    this.cancelTime = cancelTime;
+  }
+
   public String getOrderId() {
     return orderId;
   }
@@ -33,7 +49,7 @@ public class CancelOrderResponse {
     return cancelReason;
   }
 
-  public LocalDateTime getCancelTime() {
-    return cancelTime;
+  public String getCancelTime() {
+    return cancelTime.toString();
   }
 }

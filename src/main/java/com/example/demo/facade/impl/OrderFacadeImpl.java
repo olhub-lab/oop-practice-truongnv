@@ -12,6 +12,9 @@ import com.example.demo.dto.order.OrderResponse;
 import com.example.demo.dto.payment.PaymentOrderResponse;
 import com.example.demo.facade.OrderFacade;
 import com.example.demo.model.Order;
+import com.example.demo.model.enums.OrderStatus;
+import com.example.demo.port.PaymentPort;
+import com.example.demo.port.PaymentPortResolver;
 import com.example.demo.service.OrderService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,42 +24,67 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderFacadeImpl implements OrderFacade {
 
   private final OrderService orderService;
+  private final PaymentPortResolver paymentPortResolver;
 
-  public OrderFacadeImpl(OrderService orderService) {
+  public OrderFacadeImpl(OrderService orderService, PaymentPortResolver paymentPortResolver) {
     this.orderService = orderService;
+    this.paymentPortResolver = paymentPortResolver;
   }
 
   @Override
   public OrderResponse createOrder(CreateOrderRequest request) {
     log.info("Creating order for customer: {}", request.getCustomerName());
 
-    return orderService.createOrder(request);
+    Order order = orderService.create(request);
+
+    return new OrderResponse(order);
   }
 
   @Override
   public OrderResponse getOrder(String orderId) {
     log.info("Getting order with id {}", orderId);
 
-    return orderService.getOrder(orderId);
+    Order order = orderService.get(orderId);
+
+    return new OrderResponse(order);
   }
 
   @Override
   public List<OrderResponse> filterOrders(OrderFilterRequest request) {
-    log.info("Filtering orders param: {}", request);
-    return orderService.findAll(request);
+    log.info("Filtering orders with request: {}", request);
+
+    return orderService.findAll(request).stream()
+        .map(OrderResponse::new)
+        .collect(Collectors.toList());
   }
 
   @Override
   public CancelOrderResponse cancelOrder(String orderId, String cancelReason) {
     log.info("cancelOrder param: orderId = {}", orderId);
 
-    return orderService.cancelOrder(orderId, cancelReason);
+    Order order = orderService.cancelOrder(orderId, cancelReason);
+
+    return new CancelOrderResponse(order.getOrderId(), order.getStatus(), order.getCancelReason(),
+        order.getUpdatedAt());
   }
 
   @Override
   public PaymentOrderResponse processPayment(String orderId) {
-    log.info("processPayment param: orderId= {}", orderId);
+    log.info("processPayment param: orderId = {}", orderId);
 
-    return orderService.processPayment(orderId);
+    Order order = orderService.get(orderId);
+    order.validatePendingStatus();
+
+    PaymentPort paymentPort = paymentPortResolver.getPaymentPort(order.getPaymentMethod());
+
+    OrderStatus status = paymentPort.process(order);
+
+    orderService.applyPaymentResult(orderId, status);
+
+    Order updatedOrder = orderService.get(orderId);
+
+    return new PaymentOrderResponse(updatedOrder.getOrderId(), updatedOrder.getStatus(),
+        updatedOrder.getPaymentMethod(), updatedOrder.getAmount(), updatedOrder.getFinalAmount(),
+        updatedOrder.getUpdatedAt().toString());
   }
 }
