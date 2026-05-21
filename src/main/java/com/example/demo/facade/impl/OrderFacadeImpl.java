@@ -64,8 +64,7 @@ public class OrderFacadeImpl implements OrderFacade {
 
     Order order = orderService.cancelOrder(orderId, cancelReason);
 
-    return new CancelOrderResponse(order.getOrderId(), order.getStatus(), order.getCancelReason(),
-        order.getUpdatedAt());
+    return new CancelOrderResponse(order);
   }
 
   @Override
@@ -83,8 +82,6 @@ public class OrderFacadeImpl implements OrderFacade {
 
     Order updatedOrder = orderService.get(orderId);
 
-    return new PaymentOrderResponse(updatedOrder.getOrderId(), updatedOrder.getStatus(),
-        updatedOrder.getPaymentMethod(), updatedOrder.getAmount(), updatedOrder.getFinalAmount(),
-        updatedOrder.getUpdatedAt().toString());
+    return new PaymentOrderResponse(updatedOrder);
   }
 }

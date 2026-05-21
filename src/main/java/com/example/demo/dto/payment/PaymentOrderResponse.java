@@ -2,6 +2,7 @@ package com.example.demo.dto.payment;
 
 import java.math.BigDecimal;
 
+import com.example.demo.model.Order;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
 
@@ -21,6 +22,15 @@ public class PaymentOrderResponse {
     this.amount = amount;
     this.finalAmount = finalAmount;
     this.processedAt = processedAt;
+  }
+
+  public PaymentOrderResponse(Order order) {
+    this.orderId = order.getOrderId();
+    this.status = order.getStatus();
+    this.paymentMethod = order.getPaymentMethod();
+    this.amount = order.getAmount();
+    this.finalAmount = order.getFinalAmount();
+    this.processedAt = order.getUpdatedAt() != null ? order.getUpdatedAt().toString() : null;
   }
 
   public String getOrderId() {
