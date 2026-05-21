@@ -2,8 +2,10 @@ package com.example.demo.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,6 +19,7 @@ import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.persistence.OrderRepository;
 import com.example.demo.service.OrderService;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -68,12 +71,8 @@ public class OrderServiceImpl implements OrderService {
       throw new ValidationException("orderId cannot be null or empty.");
     }
 
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new OrderNotFoundException(orderId);
-    }
-
-    return order;
+    return orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(orderId));
   }
 
   @Override
@@ -89,13 +88,11 @@ public class OrderServiceImpl implements OrderService {
       throw new ValidationException("cancelReason must not be empty");
     }
 
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new OrderNotFoundException(orderId);
-    }
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(orderId));
 
     order.cancel(cancelReason);
-    orderRepository.update(order);
+    orderRepository.save(order);
 
     return order;
   }
@@ -108,7 +105,9 @@ public class OrderServiceImpl implements OrderService {
 
     validateFilterRequest(filterRequest);
 
-    return orderRepository.findAll(filterRequest);
+    Specification<Order> spec = buildFilterSpecification(filterRequest);
+
+    return orderRepository.findAll(spec);
   }
 
   @Override
@@ -116,14 +115,35 @@ public class OrderServiceImpl implements OrderService {
   public void applyPaymentResult(String orderId, OrderStatus status) {
     log.info("applyPaymentResult param: orderId = {}, status = {}", orderId, status);
 
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new OrderNotFoundException(orderId);
-    }
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(orderId));
 
     order.applyPaymentResult(status);
 
-    orderRepository.update(order);
+    orderRepository.save(order);
+  }
+
+  private Specification<Order> buildFilterSpecification(OrderFilterRequest filterRequest) {
+    return (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
+
+      if (filterRequest.getStatus() != null) {
+        predicates.add(cb.equal(root.get("status"), filterRequest.getStatus()));
+      }
+      if (filterRequest.getPaymentMethod() != null) {
+        predicates.add(cb.equal(root.get("paymentMethod"), filterRequest.getPaymentMethod()));
+      }
+      if (filterRequest.getFromDate() != null) {
+        predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), filterRequest.getFromDate()));
+      }
+      if (filterRequest.getToDate() != null) {
+        predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), filterRequest.getToDate()));
+      }
+
+      query.orderBy(cb.desc(root.get("createdAt")));
+
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
   }
 
   private void validateFilterRequest(OrderFilterRequest request) {
