@@ -8,19 +8,54 @@ import com.example.demo.exception.ValidationException;
 import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.model.enums.PaymentMethod;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "orders")
 public class Order {
 
+  @Id
+  @Column(name = "order_id")
   private String orderId;
+
+  @Column(name = "customer_id", nullable = false)
   private Long customerId;
+
+  @Column(name = "customer_name", nullable = false)
   private String customerName;
+
+  @Column(name = "amount", nullable = false)
   private BigDecimal amount;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "payment_method", nullable = false)
   private PaymentMethod paymentMethod;
+
+  @Column(name = "fee_amount")
   private BigDecimal feeAmount;
+
+  @Column(name = "discount_amount")
   private BigDecimal discountAmount;
+
+  @Column(name = "final_amount")
   private BigDecimal finalAmount;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
   private OrderStatus status;
+
+  @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
+
+  @Column(name = "cancel_reason", length = 500)
   private String cancelReason;
 
   public Order() {

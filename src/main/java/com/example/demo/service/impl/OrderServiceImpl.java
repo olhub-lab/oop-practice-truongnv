@@ -68,12 +68,8 @@ public class OrderServiceImpl implements OrderService {
       throw new ValidationException("orderId cannot be null or empty.");
     }
 
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new OrderNotFoundException(orderId);
-    }
-
-    return order;
+    return orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(orderId));
   }
 
   @Override
@@ -89,13 +85,11 @@ public class OrderServiceImpl implements OrderService {
       throw new ValidationException("cancelReason must not be empty");
     }
 
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new OrderNotFoundException(orderId);
-    }
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(orderId));
 
     order.cancel(cancelReason);
-    orderRepository.update(order);
+    orderRepository.save(order);
 
     return order;
   }
@@ -108,7 +102,11 @@ public class OrderServiceImpl implements OrderService {
 
     validateFilterRequest(filterRequest);
 
-    return orderRepository.findAll(filterRequest);
+    return orderRepository.findAllWithFilter(
+        filterRequest.getStatus(),
+        filterRequest.getPaymentMethod(),
+        filterRequest.getFromDate(),
+        filterRequest.getToDate());
   }
 
   @Override
@@ -116,14 +114,12 @@ public class OrderServiceImpl implements OrderService {
   public void applyPaymentResult(String orderId, OrderStatus status) {
     log.info("applyPaymentResult param: orderId = {}, status = {}", orderId, status);
 
-    Order order = orderRepository.findById(orderId);
-    if (order == null) {
-      throw new OrderNotFoundException(orderId);
-    }
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(orderId));
 
     order.applyPaymentResult(status);
 
-    orderRepository.update(order);
+    orderRepository.save(order);
   }
 
   private void validateFilterRequest(OrderFilterRequest request) {
