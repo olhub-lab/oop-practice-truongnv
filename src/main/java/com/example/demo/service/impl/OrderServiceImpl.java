@@ -89,9 +89,8 @@ public class OrderServiceImpl implements OrderService {
         .orElseThrow(() -> new OrderNotFoundException(orderId));
 
     order.cancel(cancelReason);
-    orderRepository.save(order);
 
-    return order;
+    return orderRepository.save(order);
   }
 
   @Override
