@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.example.demo.dto.order.CreateOrderRequest;
 import com.example.demo.dto.order.OrderFilterRequest;
@@ -64,10 +63,6 @@ public class OrderServiceImpl implements OrderService {
   public Order get(String orderId) {
     log.info("Getting order with id: {}", orderId);
 
-    if (!StringUtils.hasText(orderId)) {
-      throw new ValidationException("orderId cannot be null or empty.");
-    }
-
     return orderRepository.findById(orderId)
         .orElseThrow(() -> new OrderNotFoundException(orderId));
   }
@@ -77,21 +72,12 @@ public class OrderServiceImpl implements OrderService {
   public Order cancelOrder(String orderId, String cancelReason) {
     log.info("cancelOrder param: orderId = {}, reason = {}", orderId, cancelReason);
 
-    if (!StringUtils.hasText(orderId)) {
-      throw new ValidationException("orderId must not be empty");
-    }
-
-    if (!StringUtils.hasText(cancelReason)) {
-      throw new ValidationException("cancelReason must not be empty");
-    }
-
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new OrderNotFoundException(orderId));
 
     order.cancel(cancelReason);
-    orderRepository.save(order);
 
-    return order;
+    return orderRepository.save(order);
   }
 
   @Override
